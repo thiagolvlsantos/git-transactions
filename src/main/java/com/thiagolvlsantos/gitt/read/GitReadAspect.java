@@ -23,20 +23,20 @@ public class GitReadAspect {
 	public Object read(ProceedingJoinPoint jp) throws Throwable {
 		Signature signature = jp.getSignature();
 		GitRead annotation = getAnnotation(signature);
-		if (log.isDebugEnabled()) {
+		if (log.isInfoEnabled()) {
 			log.info("** READ.init: {}, {} **", signature.getName(), annotation);
 		}
 		long time = System.currentTimeMillis();
 		init(jp, annotation);
 		try {
 			Object result = success(jp, annotation, jp.proceed());
-			if (log.isDebugEnabled()) {
+			if (log.isInfoEnabled()) {
 				log.info("** READ.success: {} ({}) **", signature.getName(), System.currentTimeMillis() - time);
 			}
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, annotation, e);
-			if (log.isDebugEnabled()) {
+			if (log.isInfoEnabled()) {
 				log.info("** READ.failure: {} ({}) **", signature.getName(), System.currentTimeMillis() - time);
 			}
 			throw error;

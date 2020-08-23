@@ -62,15 +62,15 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			return tmp;
 		});
 		tmp.start();
-		if (log.isInfoEnabled()) {
-			log.info("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
-		}
 		while (!tmp.isAlive()) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+		}
+		if (log.isInfoEnabled()) {
+			log.info("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		}
 		return tmp;
 	}
@@ -84,14 +84,14 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		Watcher tmp = watchers.remove(key);
 		if (tmp != null) {
 			tmp.setActive(false);
-			if (log.isInfoEnabled()) {
-				log.info("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
-			}
 		}
 		try {
 			tmp.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+		if (log.isInfoEnabled()) {
+			log.info("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		}
 		return tmp;
 	}

@@ -23,20 +23,20 @@ public class GitWriteAspect {
 	public Object write(ProceedingJoinPoint jp) throws Throwable {
 		Signature signature = jp.getSignature();
 		GitWrite annotation = getAnnotation(signature);
-		if (log.isDebugEnabled()) {
+		if (log.isInfoEnabled()) {
 			log.info("** WRITE.init: {}, {} **", signature.getName(), annotation);
 		}
 		long time = System.currentTimeMillis();
 		init(jp, annotation);
 		try {
 			Object result = success(jp, annotation, jp.proceed());
-			if (log.isDebugEnabled()) {
+			if (log.isInfoEnabled()) {
 				log.info("** WRITE.success: {} ({}) **", signature.getName(), System.currentTimeMillis() - time);
 			}
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, annotation, e);
-			if (log.isDebugEnabled()) {
+			if (log.isInfoEnabled()) {
 				log.info("** WRITE.failure: {} ({}) **", signature.getName(), System.currentTimeMillis() - time);
 			}
 			throw error;
