@@ -43,7 +43,7 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("credentials({})", group);
 		}
-		return new UsernamePasswordCredentialsProvider("thiagolvlsantos", "tlvls123");
+		return new UsernamePasswordCredentialsProvider("thiagolvlsantos", "XYZ");
 	}
 
 	@Override

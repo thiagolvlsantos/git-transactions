@@ -1,4 +1,4 @@
-package com.thiagolvlsantos.gitt.file;
+package com.thiagolvlsantos.gitt.watcher;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -20,7 +20,12 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import com.thiagolvlsantos.gitt.file.EFileStatus;
+import com.thiagolvlsantos.gitt.file.FileEvent;
+import com.thiagolvlsantos.gitt.file.FileItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -28,33 +33,65 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class FileWatcher {
+public class FileWatcherListener implements ApplicationListener<FileWatcherEvent> {
 
-	@Value("${gitt.filesystem.check.interval:1000}")
+	@Value("${gitt.filesystem.check.interval:100}")
 	private long fileSystemCheckInterval;
 	private Map<String, Watcher> watchers = new HashMap<>();
 	private @Autowired ApplicationEventPublisher publisher;
 
-	public Watcher get(String group, Path dir) {
-		File system = dir.toFile();
-		if (!system.exists()) {
-			system.mkdirs();
+	@Override
+	public void onApplicationEvent(FileWatcherEvent event) {
+		switch (event.getType()) {
+		case START:
+			start(event.getGroup(), event.getDir());
+			break;
+		case STOP:
+			stop(event.getGroup(), event.getDir());
+			break;
 		}
+	}
+
+	public Watcher start(String group, Path dir) {
 		Watcher tmp = new Watcher(group, dir, true);
-		watchers.compute(group + dir.toString(), (p, w) -> {
+		String key = key(group, dir);
+		watchers.compute(key, (p, w) -> {
 			if (w != null) {
 				w.setActive(false);
 			}
 			return tmp;
 		});
 		tmp.start();
+		if (log.isInfoEnabled()) {
+			log.info("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
+		}
+		while (!tmp.isAlive()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		return tmp;
 	}
 
-	public Watcher del(String group, Path dir) {
-		Watcher tmp = watchers.remove(group + dir.toString());
+	private String key(String group, Path dir) {
+		return group + ":" + dir.toString();
+	}
+
+	public Watcher stop(String group, Path dir) {
+		String key = key(group, dir);
+		Watcher tmp = watchers.remove(key);
 		if (tmp != null) {
 			tmp.setActive(false);
+			if (log.isInfoEnabled()) {
+				log.info("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
+			}
+		}
+		try {
+			tmp.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		return tmp;
 	}
@@ -81,7 +118,7 @@ public class FileWatcher {
 						}
 						break;
 					}
-					if (key != null) {
+					if (key != null && active) {
 						items.clear();
 						for (WatchEvent<?> event : key.pollEvents()) {
 							WatchEvent.Kind<?> kind = event.kind();

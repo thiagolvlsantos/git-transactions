@@ -9,7 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import com.thiagolvlsantos.gitt.file.FileWatcher;
+import com.thiagolvlsantos.gitt.watcher.FileWatcherListener;
 
 @SpringBootApplication
 public class GittApplication {
@@ -29,17 +29,16 @@ public class GittApplication {
 			s.writeDeploymentsError();
 		} catch (Exception e) {
 		}
-		s.stop();
 		// watch(ctx);
 	}
 
 	private static void watch(ApplicationContext ctx) throws Exception {
-		FileWatcher watcher = ctx.getBean(FileWatcher.class);
+		FileWatcherListener watcher = ctx.getBean(FileWatcherListener.class);
 		Path path = Paths.get("data");
 		File dir = path.toFile();
 		dir.mkdir();
 		String group = "aqui";
-		watcher.get(group, path);
+		watcher.start(group, path);
 		System.out.println("Watcher on");
 
 		Thread.sleep(1000);
@@ -62,7 +61,7 @@ public class GittApplication {
 
 		Thread.sleep(5000);
 		System.out.println("");
-		watcher.del(group, path);
+		watcher.stop(group, path);
 		System.out.println("END");
 	}
 
