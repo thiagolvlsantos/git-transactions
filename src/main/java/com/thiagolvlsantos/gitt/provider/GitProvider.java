@@ -3,7 +3,6 @@ package com.thiagolvlsantos.gitt.provider;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.api.Git;
@@ -14,7 +13,10 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.thiagolvlsantos.gitt.config.GittConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,20 +24,35 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GitProvider implements IGitProvider {
 
-	private String remoteRepository = "https://github.com/thiagolvlsantos/%s.git";
-	private String localRepository = "data/%s";
+	private @Autowired GittConfig config;
 	private Map<String, Git> gits = new HashMap<>();
 
-	@Override
-	public File directory(String group) {
-		return new File(String.format(localRepository, group));
+	private String property(String group, String name) {
+		String tmp = config.get(group + "." + name);
+		if (tmp == null) {
+			return config.get(name);
+		}
+		return tmp;
+	}
+
+	private String local(String group) {
+		return String.format(property(group, "local"), group);
+	}
+
+	private String remote(String group) {
+		return String.format(property(group, "remote"), group);
 	}
 
 	@Override
-	public String normalize(String filePattern) {
-		String prefixo = localRepository;
-		prefixo = prefixo.replace("\\", "/");
-		return filePattern == null ? null : filePattern.replace("\\", "/").replace(prefixo + "/", "");
+	public File directory(String group) {
+		return new File(local(group));
+	}
+
+	@Override
+	public String normalize(String group, String filename) {
+		String prefix = local(group);
+		prefix = prefix.replace("\\", "/");
+		return filename == null ? null : filename.replace("\\", "/").replace(prefix + "/", "");
 	}
 
 	@Override
@@ -43,7 +60,7 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("credentials({})", group);
 		}
-		return new UsernamePasswordCredentialsProvider("thiagolvlsantos", "XYZ");
+		return new UsernamePasswordCredentialsProvider(property(group, "user"), property(group, "password"));
 	}
 
 	@Override
@@ -52,6 +69,7 @@ public class GitProvider implements IGitProvider {
 			try {
 				return instance(k);
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 		});
@@ -59,8 +77,9 @@ public class GitProvider implements IGitProvider {
 
 	@SuppressWarnings("serial")
 	private Git instance(String group) throws Exception {
-		File local = new File(directory(group), ".git");
-		String remote = String.format(remoteRepository, group);
+		File dir = directory(group);
+		File local = new File(dir, ".git");
+		String remote = remote(group);
 		if (log.isInfoEnabled()) {
 			log.info("git({}): local:{}, remote:{}", group, local, remote);
 		}
@@ -83,7 +102,7 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("pull({})", group);
 		}
-		return null;
+		return git.pull().setCredentialsProvider(credentials(group)).call();
 	}
 
 	@Override
@@ -92,7 +111,7 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("pullWrite({})", group);
 		}
-		return null;
+		return git.pull().setCredentialsProvider(credentials(group)).call();
 	}
 
 	@Override
@@ -101,7 +120,7 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("commit({}):{}", group, msg);
 		}
-		return null;
+		return git.commit().setAuthor("thiago.santos", "thiagolvlsantos@gmail.com").setMessage(msg).call();
 	}
 
 	@Override
@@ -110,7 +129,7 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("push({})", group);
 		}
-		return null;
+		return git.push().setCredentialsProvider(credentials(group)).call();
 	}
 
 	@Override
@@ -119,23 +138,23 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("pushWrite({})", group);
 		}
-		return null;
+		return git.push().setCredentialsProvider(credentials(group)).call();
 	}
 
 	@Override
 	public void clean(String group) throws GitAPIException {
-		Git git = git(group);
+		File dir = directory(group);
 		if (log.isInfoEnabled()) {
-			log.info("clean({})", group);
+			log.info("clean({}):{}", group, dir);
 		}
 	}
 
 	@Override
-	public List<RevCommit> log(String group, String path) throws GitAPIException {
+	public Iterable<RevCommit> log(String group, String path) throws GitAPIException {
 		Git git = git(group);
 		if (log.isInfoEnabled()) {
 			log.info("log({}):{}", group, path);
 		}
-		return null;
+		return git.log().call();
 	}
 }

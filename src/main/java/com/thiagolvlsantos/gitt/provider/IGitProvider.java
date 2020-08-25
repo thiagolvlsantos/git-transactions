@@ -1,7 +1,6 @@
 package com.thiagolvlsantos.gitt.provider;
 
 import java.io.File;
-import java.util.List;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
@@ -14,7 +13,7 @@ public interface IGitProvider {
 
 	File directory(String group);
 
-	String normalize(String filePattern);
+	String normalize(String group, String filePattern);
 
 	CredentialsProvider credentials(String group);
 
@@ -32,5 +31,5 @@ public interface IGitProvider {
 
 	void clean(String group) throws GitAPIException;
 
-	List<RevCommit> log(String group, String path) throws GitAPIException;
+	Iterable<RevCommit> log(String group, String path) throws GitAPIException;
 }

@@ -15,9 +15,9 @@ import com.thiagolvlsantos.gitt.write.GitWrite;
 @Component
 public class Service {
 
-	private static final String GITT_EXAMPLE_PRODUCTS = "gitt-example-products";
-	private static final String GITT_EXAMPLE_PROJECTS = "gitt-example-projects";
-	private static final String GITT_EXAMPLE_DEPLOYMENTS = "gitt-example-deployments";
+	private static final String GITT_EXAMPLE_PRODUCTS = "products";
+	private static final String GITT_EXAMPLE_PROJECTS = "projects";
+	private static final String GITT_EXAMPLE_DEPLOYMENTS = "deployments";
 	private @Autowired IGitProvider provider;
 
 	@GitRead(GITT_EXAMPLE_PROJECTS)

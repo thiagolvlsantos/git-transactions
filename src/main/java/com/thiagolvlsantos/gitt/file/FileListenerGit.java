@@ -28,7 +28,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 			Git git = provider.git(group);
 			StringBuilder msg = new StringBuilder();
 			for (FileItem item : event.getItems()) {
-				String pattern = provider.normalize(item.getFile().toString());
+				String pattern = provider.normalize(group, item.getFile().toString());
 				switch (item.getStatus()) {
 				case CREATE:
 					AddCommand add = git.add().addFilepattern(pattern);
@@ -62,6 +62,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 			}
 			provider.commit(group, tmp);
 		} catch (GitAPIException e) {
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
