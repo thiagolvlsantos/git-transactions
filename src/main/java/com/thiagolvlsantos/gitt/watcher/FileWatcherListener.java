@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FileWatcherListener implements ApplicationListener<FileWatcherEvent> {
 
-	@Value("${gitt.filesystem.check.interval:100}")
+	@Value("${gitt.filesystem.check.interval:50}")
 	private long fileSystemCheckInterval;
 	private Map<String, Watcher> watchers = new HashMap<>();
 	private @Autowired ApplicationEventPublisher publisher;
