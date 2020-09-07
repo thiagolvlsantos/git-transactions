@@ -1,9 +1,8 @@
 package com.thiagolvlsantos.gitt.read;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class GitReadListenerPrint implements ApplicationListener<GitReadEvent> {
 
 	@Override

@@ -20,14 +20,22 @@ public class GittApplication {
 		try {
 			s.readProjects();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		try {
 			s.writeProducts();
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			s.writeProducts();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		try {
 			s.writeDeploymentsError();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		// watch(ctx);
 	}

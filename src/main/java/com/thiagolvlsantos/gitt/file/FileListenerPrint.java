@@ -8,6 +8,6 @@ public class FileListenerPrint implements ApplicationListener<FileEvent> {
 
 	@Override
 	public void onApplicationEvent(FileEvent event) {
-		System.out.println("ITEMS:" + event.getItems());
+		System.out.println("ITEMS: " + event.getItems());
 	}
 }

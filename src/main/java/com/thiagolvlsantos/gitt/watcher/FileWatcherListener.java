@@ -55,9 +55,9 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 	public Watcher start(String group, Path dir) {
 		Watcher tmp = new Watcher(group, dir, true);
 		String key = key(group, dir);
-		watchers.compute(key, (p, w) -> {
-			if (w != null) {
-				w.setActive(false);
+		watchers.compute(key, (k, v) -> {
+			if (v != null) {
+				stop(group, dir);
 			}
 			return tmp;
 		});
@@ -140,12 +140,20 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 							Path child = dir.resolve(filename);
 							File file = child.toFile();
 							if (!file.toString().contains(".git")) {
-								items.add(new FileItem(file, status));
+								FileItem item = new FileItem(file, status);
+								if (log.isInfoEnabled()) {
+									log.info("ADD:" + item);
+								}
+								items.add(item);
 							} else {
-								log.info("Ignore:" + file);
+								if (log.isInfoEnabled()) {
+									log.info("Ignore:" + file);
+								}
 							}
 						}
-						publisher.publishEvent(new FileEvent(this, group, items));
+						if (!items.isEmpty()) {
+							publisher.publishEvent(new FileEvent(this, group, items));
+						}
 						boolean valid = key.reset();
 						if (!valid) {
 							break;

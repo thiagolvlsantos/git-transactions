@@ -5,6 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.dircache.DirCache;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -32,35 +33,41 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 				switch (item.getStatus()) {
 				case CREATE:
 					AddCommand add = git.add().addFilepattern(pattern);
-					msg.append("New: " + pattern + "\n");
+					msg.append("Added: " + pattern + "\n");
 					DirCache addResult = add.call();
-					if (log.isInfoEnabled()) {
-						log.info(group + ".NEW:" + addResult);
+					if (log.isDebugEnabled()) {
+						log.debug(group + ".ADDED: " + addResult);
 					}
 					break;
 				case MODIFY:
 					AddCommand update = git.add().addFilepattern(pattern);
 					msg.append("Updated: " + pattern + "\n");
 					DirCache addResultUpdate = update.call();
-					if (log.isInfoEnabled()) {
-						log.info(group + ".UPDATED:" + addResultUpdate);
+					if (log.isDebugEnabled()) {
+						log.debug(group + ".UPDATED: " + addResultUpdate);
 					}
 					break;
 				case DELETE:
 					RmCommand delete = git.rm().addFilepattern(pattern);
 					msg.append("Deleted: " + pattern + "\n");
 					DirCache deleteResult = delete.call();
-					if (log.isInfoEnabled()) {
-						log.info(group + ".DELETED:" + deleteResult);
+					if (log.isDebugEnabled()) {
+						log.debug(group + ".DELETED: " + deleteResult);
 					}
 					break;
 				}
 			}
-			String tmp = msg.toString();
-			if (log.isInfoEnabled()) {
-				log.info(group + ".COMMIT MESSAGE:" + tmp);
+			if (msg.length() > 0) {
+				msg.setLength(msg.length() - 1);
+				String tmp = msg.toString();
+				if (log.isInfoEnabled()) {
+					log.info(group + ".MESSAGE:\n" + tmp);
+				}
+				RevCommit commit = provider.commit(group, tmp);
+				if (log.isInfoEnabled()) {
+					log.info(group + ".COMMIT: " + commit);
+				}
 			}
-			provider.commit(group, tmp);
 		} catch (GitAPIException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

@@ -1,9 +1,8 @@
 package com.thiagolvlsantos.gitt.write;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class GitWriteListenerPrint implements ApplicationListener<GitWriteEvent> {
 
 	@Override

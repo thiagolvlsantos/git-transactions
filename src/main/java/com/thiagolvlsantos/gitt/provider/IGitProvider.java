@@ -31,5 +31,7 @@ public interface IGitProvider {
 
 	void clean(String group) throws GitAPIException;
 
+	void cleanWrite(String group) throws GitAPIException;
+
 	Iterable<RevCommit> log(String group, String path) throws GitAPIException;
 }

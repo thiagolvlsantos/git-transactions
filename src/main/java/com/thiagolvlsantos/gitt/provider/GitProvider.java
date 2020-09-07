@@ -13,7 +13,9 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.thiagolvlsantos.gitt.config.GittConfig;
@@ -24,10 +26,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GitProvider implements IGitProvider {
 
-	private @Autowired GittConfig config;
+	private static final String REPO_LOCAL = "local";
+	private static final String REPO_REMOTE = "remote";
+	private static final String REPO_USER = "user";
+	private static final String REPO_PASSWORD = "password";
+
+	private @Autowired ApplicationContext context;
 	private Map<String, Git> gits = new HashMap<>();
 
 	private String property(String group, String name) {
+		GittConfig config = context.getBean(GittConfig.class);
 		String tmp = config.get(group + "." + name);
 		if (tmp == null) {
 			return config.get(name);
@@ -36,11 +44,11 @@ public class GitProvider implements IGitProvider {
 	}
 
 	private String local(String group) {
-		return String.format(property(group, "local"), group);
+		return String.format(property(group, REPO_LOCAL), group);
 	}
 
 	private String remote(String group) {
-		return String.format(property(group, "remote"), group);
+		return String.format(property(group, REPO_REMOTE), group);
 	}
 
 	@Override
@@ -60,7 +68,7 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("credentials({})", group);
 		}
-		return new UsernamePasswordCredentialsProvider(property(group, "user"), property(group, "password"));
+		return new UsernamePasswordCredentialsProvider(property(group, REPO_USER), property(group, REPO_PASSWORD));
 	}
 
 	@Override
@@ -77,8 +85,7 @@ public class GitProvider implements IGitProvider {
 
 	@SuppressWarnings("serial")
 	private Git instance(String group) throws Exception {
-		File dir = directory(group);
-		File local = new File(dir, ".git");
+		File local = directory(group);
 		String remote = remote(group);
 		if (log.isInfoEnabled()) {
 			log.info("git({}): local:{}, remote:{}", group, local, remote);
@@ -117,10 +124,16 @@ public class GitProvider implements IGitProvider {
 	@Override
 	public RevCommit commit(String group, String msg) throws GitAPIException {
 		Git git = git(group);
-		if (log.isInfoEnabled()) {
-			log.info("commit({}):{}", group, msg);
+		IGitAudit audit;
+		try {
+			audit = context.getBean(IGitAudit.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			audit = IGitAudit.INSTANCE;
 		}
-		return git.commit().setAuthor("thiago.santos", "thiagolvlsantos@gmail.com").setMessage(msg).call();
+		if (log.isInfoEnabled()) {
+			log.info("commit({}): {}, {} -> {}", group, audit.username(), audit.email(), msg);
+		}
+		return git.commit().setAuthor(audit.username(), audit.email()).setMessage(msg).call();
 	}
 
 	@Override
@@ -146,6 +159,14 @@ public class GitProvider implements IGitProvider {
 		File dir = directory(group);
 		if (log.isInfoEnabled()) {
 			log.info("clean({}):{}", group, dir);
+		}
+	}
+
+	@Override
+	public void cleanWrite(String group) throws GitAPIException {
+		File dir = directory(group);
+		if (log.isInfoEnabled()) {
+			log.info("cleanWrite({}):{}", group, dir);
 		}
 	}
 
