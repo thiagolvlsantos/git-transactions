@@ -8,7 +8,10 @@ import org.springframework.stereotype.Component;
 
 import com.thiagolvlsantos.gitt.provider.IGitProvider;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class GitReadListener implements ApplicationListener<GitReadEvent> {
 
 	private @Autowired ApplicationContext context;
@@ -30,7 +33,9 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 				break;
 			}
 		} catch (GitAPIException e) {
-			e.printStackTrace();
+			if(log.isDebugEnabled()) {
+				log.debug(e.getMessage(),e);
+			}
 			throw new RuntimeException(e);
 		}
 	}

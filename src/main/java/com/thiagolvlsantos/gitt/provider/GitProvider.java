@@ -77,7 +77,9 @@ public class GitProvider implements IGitProvider {
 			try {
 				return instance(k);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(log.isDebugEnabled()) {
+					log.debug(e.getMessage(),e);
+				}
 				throw new RuntimeException(e);
 			}
 		});

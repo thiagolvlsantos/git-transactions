@@ -69,7 +69,9 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 				}
 			}
 		} catch (GitAPIException e) {
-			e.printStackTrace();
+			if(log.isDebugEnabled()) {
+				log.debug(e.getMessage(),e);
+			}
 			throw new RuntimeException(e);
 		}
 	}
