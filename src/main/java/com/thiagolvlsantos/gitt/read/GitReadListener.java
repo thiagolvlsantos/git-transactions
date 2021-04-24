@@ -23,13 +23,13 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 			String group = event.getAnnotation().value();
 			switch (event.getType()) {
 			case INIT:
-				provider.pull(group);
+				provider.pullRead(group);
 				break;
 			case SUCCESS:
-				provider.push(group);
+				provider.pushRead(group);
 				break;
 			case FAILURE:
-				provider.clean(group);
+				provider.cleanRead(group);
 				break;
 			}
 		} catch (GitAPIException e) {

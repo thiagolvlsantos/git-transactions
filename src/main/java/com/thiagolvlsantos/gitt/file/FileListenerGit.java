@@ -26,10 +26,10 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 		try {
 			IGitProvider provider = context.getBean(IGitProvider.class);
 			String group = event.getGroup();
-			Git git = provider.git(group);
+			Git git = provider.gitWrite(group);
 			StringBuilder msg = new StringBuilder();
 			for (FileItem item : event.getItems()) {
-				String pattern = provider.normalize(group, item.getFile().toString());
+				String pattern = provider.normalizeWrite(group, item.getFile().toString());
 				switch (item.getStatus()) {
 				case CREATE:
 					AddCommand add = git.add().addFilepattern(pattern);
@@ -63,7 +63,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 				if (log.isInfoEnabled()) {
 					log.info(group + ".MESSAGE:\n" + tmp);
 				}
-				RevCommit commit = provider.commit(group, tmp);
+				RevCommit commit = provider.commitWrite(group, tmp);
 				if (log.isInfoEnabled()) {
 					log.info(group + ".COMMIT: " + commit);
 				}

@@ -11,27 +11,37 @@ import org.eclipse.jgit.transport.PushResult;
 
 public interface IGitProvider {
 
-	File directory(String group);
+	File directoryRead(String group);
 
-	String normalize(String group, String filePattern);
+	File directoryWrite(String group);
+
+	String normalizeRead(String group, String filePattern);
+	
+	String normalizeWrite(String group, String filePattern);
 
 	CredentialsProvider credentials(String group);
 
-	Git git(String group) throws GitAPIException;
+	Git gitRead(String group) throws GitAPIException;
 
-	PullResult pull(String group) throws GitAPIException;
+	Git gitWrite(String group) throws GitAPIException;
+
+	PullResult pullRead(String group) throws GitAPIException;
 
 	PullResult pullWrite(String group) throws GitAPIException;
 
-	RevCommit commit(String group, String msg) throws GitAPIException;
+	RevCommit commitRead(String group, String msg) throws GitAPIException;
 
-	Iterable<PushResult> push(String group) throws GitAPIException;
+	RevCommit commitWrite(String group, String msg) throws GitAPIException;
+
+	Iterable<PushResult> pushRead(String group) throws GitAPIException;
 
 	Iterable<PushResult> pushWrite(String group) throws GitAPIException;
 
-	void clean(String group) throws GitAPIException;
+	void cleanRead(String group) throws GitAPIException;
 
 	void cleanWrite(String group) throws GitAPIException;
 
-	Iterable<RevCommit> log(String group, String path) throws GitAPIException;
+	Iterable<RevCommit> logRead(String group, String path) throws GitAPIException;
+
+	Iterable<RevCommit> logWrite(String group, String path) throws GitAPIException;
 }

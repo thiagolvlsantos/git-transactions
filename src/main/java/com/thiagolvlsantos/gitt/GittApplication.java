@@ -17,8 +17,13 @@ public class GittApplication {
 	public static void main(String[] args) throws Exception {
 		ApplicationContext ctx = SpringApplication.run(GittApplication.class, args);
 		Service s = ctx.getBean(Service.class);
+//		try {
+//			s.readProjects();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		try {
-			s.readProjects();
+			s.writeProducts();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -27,16 +32,11 @@ public class GittApplication {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		try {
-			s.writeProducts();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			s.writeDeploymentsError();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			s.writeDeploymentsError();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		// watch(ctx);
 	}
 

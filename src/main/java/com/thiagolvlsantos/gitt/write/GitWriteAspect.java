@@ -5,10 +5,15 @@ import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
+
+import com.thiagolvlsantos.gitt.id.ISessionIdHolder;
+import com.thiagolvlsantos.gitt.provider.IGitProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GitWriteAspect {
 
+	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
 
 	@Around("@annotation(com.thiagolvlsantos.gitt.write.GitWrite)")
@@ -40,6 +46,9 @@ public class GitWriteAspect {
 				log.info("** WRITE.failure: {} ({}) **", signature.getName(), System.currentTimeMillis() - time);
 			}
 			throw error;
+		} finally {
+			context.getBean(IGitProvider.class).cleanWrite(annotation.value());
+			sessionHolder().clear();
 		}
 	}
 
@@ -64,5 +73,15 @@ public class GitWriteAspect {
 		GitWriteEvent event = new GitWriteEvent(jp, annotation, EGitWrite.FAILURE, e);
 		publisher.publishEvent(event);
 		return event.getError();
+	}
+
+	private ISessionIdHolder sessionHolder() {
+		ISessionIdHolder sessionHolder = null;
+		try {
+			sessionHolder = context.getBean(ISessionIdHolder.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			sessionHolder = ISessionIdHolder.INSTANCE;
+		}
+		return sessionHolder;
 	}
 }

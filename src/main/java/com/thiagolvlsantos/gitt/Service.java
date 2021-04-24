@@ -27,7 +27,7 @@ public class Service {
 
 	@GitRead(GITT_EXAMPLE_PROJECTS)
 	public void readProjects() throws IOException {
-		File directory = provider.directory(GITT_EXAMPLE_PROJECTS);
+		File directory = provider.directoryRead(GITT_EXAMPLE_PROJECTS);
 		System.out.println("...readProjects..." + directory);
 		File file = projects(directory);
 		services.notify(this, GITT_EXAMPLE_PROJECTS, EFileStatus.CREATE, file);
@@ -46,7 +46,7 @@ public class Service {
 
 	@GitWrite(GITT_EXAMPLE_PRODUCTS)
 	public void writeProducts() throws IOException {
-		File directory = provider.directory(GITT_EXAMPLE_PRODUCTS);
+		File directory = provider.directoryRead(GITT_EXAMPLE_PRODUCTS);
 		System.out.println("...writeProducts..." + directory);
 		File file = products(directory);
 		services.notify(this, GITT_EXAMPLE_PRODUCTS, EFileStatus.CREATE, file);
@@ -65,7 +65,7 @@ public class Service {
 
 	@GitWrite(GITT_EXAMPLE_DEPLOYMENTS)
 	public void writeDeploymentsError() {
-		System.out.println("...write.error..." + provider.directory(GITT_EXAMPLE_DEPLOYMENTS));
+		System.out.println("...write.error..." + provider.directoryRead(GITT_EXAMPLE_DEPLOYMENTS));
 		throw new RuntimeException("Falhei!");
 	}
 }
