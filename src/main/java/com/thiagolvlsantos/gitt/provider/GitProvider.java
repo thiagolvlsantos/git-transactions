@@ -8,8 +8,6 @@ import java.util.Map;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -143,7 +141,7 @@ public class GitProvider implements IGitProvider {
 	}
 
 	@SuppressWarnings("serial")
-	private Git instance(String group, File local) throws GitAPIException, InvalidRemoteException, TransportException {
+	private Git instance(String group, File local) throws GitAPIException {
 		String remote = remote(group);
 		if (log.isInfoEnabled()) {
 			log.info("git({}): local:{}, remote:{}", group, local, remote);
@@ -234,34 +232,42 @@ public class GitProvider implements IGitProvider {
 		return push(group, gitWrite(group));
 	}
 
-	private Iterable<PushResult> push(String group, Git git)
-			throws GitAPIException, InvalidRemoteException, TransportException {
+	private Iterable<PushResult> push(String group, Git git) throws GitAPIException {
 		return git.push().setCredentialsProvider(credentials(group)).call();
 	}
 
 	@Override
 	public void cleanRead(String group) throws GitAPIException {
+		String key = keyRead(group);
 		File dir = directoryRead(group);
 		if (log.isInfoEnabled()) {
-			log.info("clean({}):{}", group, dir);
+			log.info("cleanRead({}):{}", key, dir);
 		}
-		Git git = this.gitsRead.remove(group);
+		Git git = this.gitsRead.remove(key);
 		git.close();
 	}
 
 	@Override
 	public void cleanWrite(String group) throws GitAPIException {
+		String key = keyWrite(group);
 		File dir = directoryWrite(group);
 		if (log.isInfoEnabled()) {
-			log.info("cleanWrite({}):{}", group, dir);
+			log.info("cleanWrite({}):{}", key, dir);
 		}
-		Git git = this.gitsWrite.remove(keyWrite(group));
+		Git git = this.gitsWrite.remove(key);
 		git.close();
-		if (FileSystemUtils.deleteRecursively(directoryWrite(group))) {
-			if (log.isInfoEnabled()) {
-				log.info("cleanWrite cleanup failure.");
+		try {
+			if (FileSystemUtils.deleteRecursively(dir.toPath())) {
+				if (log.isInfoEnabled()) {
+					log.info("cleanWrite failure.");
+				}
+			}
+		} catch (IOException e) {
+			if (log.isErrorEnabled()) {
+				log.error(e.getMessage(), e);
 			}
 		}
+
 	}
 
 	@Override

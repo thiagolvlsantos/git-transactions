@@ -21,7 +21,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
-	implementation 'org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r'
+	implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
