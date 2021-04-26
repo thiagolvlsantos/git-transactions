@@ -9,28 +9,24 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.thiagolvlsantos.gitt.file.EFileStatus;
-import com.thiagolvlsantos.gitt.file.FileServices;
 import com.thiagolvlsantos.gitt.provider.IGitProvider;
 import com.thiagolvlsantos.gitt.write.GitWrite;
 
 @Component
-public class ServiceWrite {
+public class ServiceWriteWatcher {
 
 	private static final String GITT_EXAMPLE_PROJECTS = "projects";
 
 	private @Autowired IGitProvider provider;
-	private @Autowired FileServices services;
 
-	@GitWrite(GITT_EXAMPLE_PROJECTS)
+	@GitWrite(value = GITT_EXAMPLE_PROJECTS, watcher = true)
 	public void writeProjects() throws IOException {
 		File directory = provider.directoryWrite(GITT_EXAMPLE_PROJECTS);
 		System.out.println("...writeProjects..." + directory);
-		File file = projects(directory);
+		projects(directory);
 		for (File f : directory.listFiles()) {
 			System.out.println(f.getName());
 		}
-		services.notify(this, GITT_EXAMPLE_PROJECTS, EFileStatus.CREATE, file);
 	}
 
 	private File projects(File directory) throws FileNotFoundException, IOException {

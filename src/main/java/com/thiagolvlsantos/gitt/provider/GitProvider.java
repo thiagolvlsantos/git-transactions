@@ -2,8 +2,9 @@ package com.thiagolvlsantos.gitt.provider;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 
 import com.thiagolvlsantos.gitt.config.GittConfig;
-import com.thiagolvlsantos.gitt.id.ISessionIdHolder;
+import com.thiagolvlsantos.gitt.id.SessionIdHolderHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,8 +36,8 @@ public class GitProvider implements IGitProvider {
 	private static final String REPO_PASSWORD = "password";
 
 	private @Autowired ApplicationContext context;
-	private Map<String, Git> gitsRead = new HashMap<>();
-	private Map<String, Git> gitsWrite = new HashMap<>();
+	private Map<String, Git> gitsRead = new ConcurrentHashMap<>();
+	private Map<String, Git> gitsWrite = new ConcurrentHashMap<>();
 
 	private String property(String group, String name) {
 		GittConfig config = context.getBean(GittConfig.class);
@@ -66,17 +67,7 @@ public class GitProvider implements IGitProvider {
 
 	@Override
 	public File directoryWrite(String group) {
-		return new File(new File(write(group)), sessionHolder().current());
-	}
-
-	private ISessionIdHolder sessionHolder() {
-		ISessionIdHolder sessionHolder = null;
-		try {
-			sessionHolder = context.getBean(ISessionIdHolder.class);
-		} catch (NoSuchBeanDefinitionException e) {
-			sessionHolder = ISessionIdHolder.INSTANCE;
-		}
-		return sessionHolder;
+		return new File(new File(write(group)), SessionIdHolderHelper.holder(context).current());
 	}
 
 	@Override
@@ -137,7 +128,7 @@ public class GitProvider implements IGitProvider {
 	}
 
 	private String keyWrite(String group) {
-		return group + "_" + sessionHolder().current();
+		return group + "_" + SessionIdHolderHelper.holder(context).current();
 	}
 
 	@SuppressWarnings("serial")
@@ -219,9 +210,9 @@ public class GitProvider implements IGitProvider {
 	@Override
 	public Iterable<PushResult> pushRead(String group) throws GitAPIException {
 		if (log.isInfoEnabled()) {
-			log.info("pushWrite({})", group);
+			log.info("pushRead({}) NOP", group);
 		}
-		return push(group, gitRead(group));
+		return new LinkedList<>();// push(group, gitRead(group));
 	}
 
 	@Override
@@ -241,10 +232,10 @@ public class GitProvider implements IGitProvider {
 		String key = keyRead(group);
 		File dir = directoryRead(group);
 		if (log.isInfoEnabled()) {
-			log.info("cleanRead({}):{}", key, dir);
+			log.info("cleanRead({}):{} NOP", key, dir);
 		}
-		Git git = this.gitsRead.remove(key);
-		git.close();
+//		Git git = this.gitsRead.remove(key);
+//		git.close();
 	}
 
 	@Override

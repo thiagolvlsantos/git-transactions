@@ -9,5 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GitWrite {
 
-	String value() default "";
+	String value();
+
+	boolean watcher() default false;
 }

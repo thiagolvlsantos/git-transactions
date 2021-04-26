@@ -6,5 +6,5 @@ public interface ISessionIdHolder {
 
 	void clear();
 
-	ISessionIdHolder INSTANCE = new SessionIdHolderThreadLocal();
+	ISessionIdHolder INSTANCE = new SessionIdHolderTime();
 }
