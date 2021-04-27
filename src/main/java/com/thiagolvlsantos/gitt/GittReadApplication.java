@@ -10,8 +10,12 @@ public class GittReadApplication {
 	public static void main(String[] args) throws Exception {
 		ApplicationContext ctx = SpringApplication.run(GittReadApplication.class, args);
 		ServiceRead s = ctx.getBean(ServiceRead.class);
-		s.readProjects();
-		s.readProjects();
-		s.readProjects();
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		s.read();
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		s.readMix();
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		s.readDouble();
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

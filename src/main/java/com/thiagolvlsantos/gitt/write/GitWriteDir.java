@@ -7,11 +7,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GitWrite {
+public @interface GitWriteDir {
 
-	String value() default "";
+	String value();
 
 	boolean watcher() default true;
-
-	GitWriteDir[] values() default {};
 }

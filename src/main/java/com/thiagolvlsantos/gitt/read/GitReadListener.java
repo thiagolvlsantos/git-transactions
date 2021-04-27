@@ -1,5 +1,8 @@
 package com.thiagolvlsantos.gitt.read;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -20,21 +23,32 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 	public void onApplicationEvent(GitReadEvent event) {
 		try {
 			IGitProvider provider = context.getBean(IGitProvider.class);
-			String group = event.getAnnotation().value();
-			switch (event.getType()) {
-			case INIT:
-				provider.pullRead(group);
-				break;
-			case SUCCESS:
-				provider.pushRead(group);
-				break;
-			case FAILURE:
-				provider.cleanRead(group);
-				break;
+			GitRead annotation = event.getAnnotation();
+			List<String> gs = new LinkedList<>();
+			String group = annotation.value();
+			if (!group.isEmpty()) {
+				gs.add(group);
+			}
+			GitReadDir[] values = annotation.values();
+			for (GitReadDir v : values) {
+				gs.add(v.value());
+			}
+			for (String g : gs) {
+				switch (event.getType()) {
+				case INIT:
+					provider.pullRead(g);
+					break;
+				case SUCCESS:
+					provider.pushRead(g);
+					break;
+				case FAILURE:
+					provider.cleanRead(g);
+					break;
+				}
 			}
 		} catch (GitAPIException e) {
-			if(log.isDebugEnabled()) {
-				log.debug(e.getMessage(),e);
+			if (log.isDebugEnabled()) {
+				log.debug(e.getMessage(), e);
 			}
 			throw new RuntimeException(e);
 		}

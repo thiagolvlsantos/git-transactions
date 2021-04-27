@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GitRead {
 
-	String value();
+	String value() default "";
 
-	boolean watcher() default false;
+	GitReadDir[] values() default {};
 }

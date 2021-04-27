@@ -1,5 +1,8 @@
 package com.thiagolvlsantos.gitt.write;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -17,17 +20,28 @@ public class GitWriteListener implements ApplicationListener<GitWriteEvent> {
 	public void onApplicationEvent(GitWriteEvent event) {
 		try {
 			IGitProvider provider = context.getBean(IGitProvider.class);
-			String group = event.getAnnotation().value();
-			switch (event.getType()) {
-			case INIT:
-				provider.pullWrite(group);
-				break;
-			case SUCCESS:
-				provider.pushWrite(group);
-				break;
-			case FAILURE:
-				provider.cleanWrite(group);
-				break;
+			GitWrite annotation = event.getAnnotation();
+			List<String> gs = new LinkedList<>();
+			String group = annotation.value();
+			if (!group.isEmpty()) {
+				gs.add(group);
+			}
+			GitWriteDir[] values = annotation.values();
+			for (GitWriteDir v : values) {
+				gs.add(v.value());
+			}
+			for (String g : gs) {
+				switch (event.getType()) {
+				case INIT:
+					provider.pullWrite(g);
+					break;
+				case SUCCESS:
+					provider.pushWrite(g);
+					break;
+				case FAILURE:
+					provider.cleanWrite(g);
+					break;
+				}
 			}
 		} catch (GitAPIException e) {
 			throw new RuntimeException(e);

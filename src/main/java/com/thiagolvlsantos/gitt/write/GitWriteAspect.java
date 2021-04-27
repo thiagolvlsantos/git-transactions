@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.thiagolvlsantos.gitt.id.SessionIdHolderHelper;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 @Component
 @Slf4j
+@Order(0)
 public class GitWriteAspect {
 
 	private @Autowired ApplicationContext context;
@@ -34,31 +36,35 @@ public class GitWriteAspect {
 		Signature signature = jp.getSignature();
 		String name = signature.getName();
 		GitWrite annotation = getAnnotation(signature);
-		String group = annotation.value();
 		long time = System.currentTimeMillis();
 		init(jp, annotation);
 		startWatcher(annotation);
 		if (log.isInfoEnabled()) {
-			log.info("** WRITE({}).init: {}, {} **", group, name, System.currentTimeMillis() - time);
+			log.info("** WRITE({}).init: {}, {} **", name, System.currentTimeMillis() - time, annotation);
 		}
 		try {
 			time = System.currentTimeMillis();
 			Object result = success(jp, annotation, jp.proceed());
 			if (log.isInfoEnabled()) {
-				log.info("** WRITE({}).success: {} ({}) **", group, name, System.currentTimeMillis() - time);
+				log.info("** WRITE({}).success: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
 			}
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, annotation, e);
 			if (log.isInfoEnabled()) {
-				log.info("** WRITE({}).failure: {} ({}) **", group, name, System.currentTimeMillis() - time);
+				log.info("** WRITE({}).failure: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
 			}
 			throw error;
 		} finally {
 			time = System.currentTimeMillis();
-			context.getBean(IGitProvider.class).cleanWrite(group);
+			if (!annotation.value().isEmpty()) {
+				context.getBean(IGitProvider.class).cleanWrite(annotation.value());
+			}
+			for (GitWriteDir d : annotation.values()) {
+				context.getBean(IGitProvider.class).cleanWrite(d.value());
+			}
 			SessionIdHolderHelper.holder(context).clear();
-			log.info("** WRITE({}).finalyze: {} ({}) **", group, name, System.currentTimeMillis() - time);
+			log.info("** WRITE({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
 		}
 	}
 
@@ -70,10 +76,17 @@ public class GitWriteAspect {
 	}
 
 	private void startWatcher(GitWrite annotation) {
-		if (annotation.watcher()) {
+		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
 			Path path = provider.directoryWrite(group).toPath();
 			publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.START, group, path));
+		}
+		for (GitWriteDir d : annotation.values()) {
+			if (d.watcher()) {
+				String g = d.value();
+				Path p = provider.directoryWrite(g).toPath();
+				publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.START, g, p));
+			}
 		}
 	}
 
@@ -96,10 +109,17 @@ public class GitWriteAspect {
 	}
 
 	private void stopWatcher(GitWrite annotation) {
-		if (annotation.watcher()) {
+		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
 			Path path = provider.directoryWrite(group).toPath();
 			publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.STOP, group, path));
+		}
+		for (GitWriteDir d : annotation.values()) {
+			if (d.watcher()) {
+				String g = d.value();
+				Path p = provider.directoryWrite(g).toPath();
+				publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.STOP, g, p));
+			}
 		}
 	}
 }

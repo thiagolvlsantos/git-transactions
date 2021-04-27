@@ -5,17 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
-public class GittWriteApplication {
+public class GittWriteNotifyApplication {
 
 	public static void main(String[] args) throws Exception {
-		ApplicationContext ctx = SpringApplication.run(GittWriteApplication.class, args);
-		ServiceWrite s = ctx.getBean(ServiceWrite.class);
+		ApplicationContext ctx = SpringApplication.run(GittWriteNotifyApplication.class, args);
+		ServiceWriteNotify s = ctx.getBean(ServiceWriteNotify.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		s.write();
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		s.writeMix();
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		s.writeDouble();
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

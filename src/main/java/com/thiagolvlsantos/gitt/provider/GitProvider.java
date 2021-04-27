@@ -224,8 +224,8 @@ public class GitProvider implements IGitProvider {
 		if (log.isInfoEnabled()) {
 			log.info("cleanRead({}):{} NOP", key, dir);
 		}
-//		Git git = this.gitsRead.remove(key);
-//		git.close();
+		Git git = this.gitsRead.remove(key);
+		git.close();
 	}
 
 	@Override
