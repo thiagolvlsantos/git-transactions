@@ -1,9 +1,7 @@
 package com.thiagolvlsantos.gitt;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,23 +18,13 @@ public class ServiceWriteWatcher {
 	private @Autowired IGitProvider provider;
 
 	@GitWrite(value = GITT_EXAMPLE_PROJECTS, watcher = true)
-	public void writeProjects() throws IOException {
+	public void writeProjects() throws Exception {
 		File directory = provider.directoryWrite(GITT_EXAMPLE_PROJECTS);
-		System.out.println("...writeProjects..." + directory);
-		projects(directory);
-		for (File f : directory.listFiles()) {
-			System.out.println(f.getName());
-		}
-	}
-
-	private File projects(File directory) throws FileNotFoundException, IOException {
 		File file = new File(directory, "projectA.txt");
-		if (file.exists()) {
-			file.delete();
-		}
 		FileOutputStream out = new FileOutputStream(file);
 		out.write(("{\"name\": \"projectA\", date: \"" + LocalDateTime.now() + "\"}").getBytes());
 		out.close();
-		return file;
+		System.out.println("...writeProjects..." + directory + " DONE");
 	}
+
 }

@@ -14,7 +14,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -87,8 +86,8 @@ public class GitProvider implements IGitProvider {
 
 	@Override
 	public CredentialsProvider credentials(String group) {
-		if (log.isInfoEnabled()) {
-			log.info("credentials({})", group);
+		if (log.isDebugEnabled()) {
+			log.debug("credentials({})", group);
 		}
 		return new UsernamePasswordCredentialsProvider(property(group, REPO_USER), property(group, REPO_PASSWORD));
 	}
@@ -152,22 +151,18 @@ public class GitProvider implements IGitProvider {
 
 	@Override
 	public PullResult pullRead(String group) throws GitAPIException {
+		long time = System.currentTimeMillis();
+		PullResult pull = gitRead(group).pull().setCredentialsProvider(credentials(group)).call();
 		if (log.isInfoEnabled()) {
-			log.info("pullRead({})", group);
+			log.info("pullRead({}) time={}", group, System.currentTimeMillis() - time);
 		}
-		return pull(group, gitRead(group));
-	}
-
-	private PullResult pull(String group, Git git) throws GitAPIException {
-		return git.pull().setCredentialsProvider(credentials(group)).call();
+		return pull;
 	}
 
 	@Override
 	public PullResult pullWrite(String group) throws GitAPIException {
-		if (log.isInfoEnabled()) {
-			log.info("pullWrite({})", group);
-		}
 		PullResult result = pullRead(group);
+		long time = System.currentTimeMillis();
 		try {
 			FileSystemUtils.copyRecursively(directoryRead(group), directoryWrite(group));
 		} catch (IOException e) {
@@ -175,6 +170,9 @@ public class GitProvider implements IGitProvider {
 				log.debug(e.getMessage(), e);
 			}
 			throw new RuntimeException(e);
+		}
+		if (log.isInfoEnabled()) {
+			log.info("pullWrite({}) time={}", group, System.currentTimeMillis() - time);
 		}
 		return result;
 	}
@@ -190,41 +188,33 @@ public class GitProvider implements IGitProvider {
 	}
 
 	private RevCommit commit(String group, String msg, Git git) throws GitAPIException {
-		IGitAudit audit = audit();
+		IGitAudit audit = GitAuditHelper.audit(context);
+		long time = System.currentTimeMillis();
+		RevCommit call = git.commit().setAuthor(audit.username(), audit.email()).setMessage(msg).call();
 		if (log.isInfoEnabled()) {
-			log.info("commit({}): {}, {} -> {}", group, audit.username(), audit.email(), msg);
+			log.info("commit({}) time={}: {}, {} -> {}", group, System.currentTimeMillis() - time, audit.username(),
+					audit.email(), msg);
 		}
-		return git.commit().setAuthor(audit.username(), audit.email()).setMessage(msg).call();
-	}
-
-	private IGitAudit audit() {
-		IGitAudit audit;
-		try {
-			audit = context.getBean(IGitAudit.class);
-		} catch (NoSuchBeanDefinitionException e) {
-			audit = IGitAudit.INSTANCE;
-		}
-		return audit;
+		return call;
 	}
 
 	@Override
 	public Iterable<PushResult> pushRead(String group) throws GitAPIException {
-		if (log.isInfoEnabled()) {
-			log.info("pushRead({}) NOP", group);
-		}
-		return new LinkedList<>();// push(group, gitRead(group));
+		return new LinkedList<>();
 	}
 
 	@Override
 	public Iterable<PushResult> pushWrite(String group) throws GitAPIException {
-		if (log.isInfoEnabled()) {
-			log.info("pushWrite({})", group);
-		}
-		return push(group, gitWrite(group));
+		return push(group, gitWrite(group), "pushWrite");
 	}
 
-	private Iterable<PushResult> push(String group, Git git) throws GitAPIException {
-		return git.push().setCredentialsProvider(credentials(group)).call();
+	private Iterable<PushResult> push(String group, Git git, String msg) throws GitAPIException {
+		long time = System.currentTimeMillis();
+		Iterable<PushResult> call = git.push().setCredentialsProvider(credentials(group)).call();
+		if (log.isInfoEnabled()) {
+			log.info(msg + "({}) time={}", group, System.currentTimeMillis() - time);
+		}
+		return call;
 	}
 
 	@Override
@@ -255,7 +245,7 @@ public class GitProvider implements IGitProvider {
 			}
 		} catch (IOException e) {
 			if (log.isErrorEnabled()) {
-				log.error(e.getMessage(), e);
+				log.error(e.getMessage());
 			}
 		}
 

@@ -15,10 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -35,19 +33,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FileWatcherListener implements ApplicationListener<FileWatcherEvent> {
 
-	@Value("${gitt.filesystem.check.interval:50}")
-	private long fileSystemCheckInterval;
 	private Map<String, Watcher> watchers = new HashMap<>();
 	private @Autowired ApplicationEventPublisher publisher;
 
 	@Override
 	public void onApplicationEvent(FileWatcherEvent event) {
+		String group = event.getGroup();
+		Path dir = event.getDir();
 		switch (event.getType()) {
 		case START:
-			start(event.getGroup(), event.getDir());
+			start(group, dir);
 			break;
 		case STOP:
-			stop(event.getGroup(), event.getDir());
+			stop(group, dir);
 			break;
 		}
 	}
@@ -109,17 +107,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 				WatchKey register = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 				List<FileItem> items = new LinkedList<>();
 				while (active) {
-					WatchKey key;
-					try {
-						key = watcher.poll(fileSystemCheckInterval, TimeUnit.MILLISECONDS);
-					} catch (InterruptedException e) {
-						if (log.isDebugEnabled()) {
-							log.debug("POLL error", e);
-						}
-						break;
-					}
+					WatchKey key = watcher.poll();
 					if (key != null && active) {
-						items.clear();
 						for (WatchEvent<?> event : key.pollEvents()) {
 							WatchEvent.Kind<?> kind = event.kind();
 							if (kind == OVERFLOW) {
@@ -142,7 +131,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 							if (!file.toString().contains(".git")) {
 								FileItem item = new FileItem(file, status);
 								if (log.isInfoEnabled()) {
-									log.info("ADD:" + item);
+									log.info(status + ":" + item);
 								}
 								items.add(item);
 							} else {
@@ -151,14 +140,14 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 								}
 							}
 						}
-						if (!items.isEmpty()) {
-							publisher.publishEvent(new FileEvent(this, group, items));
-						}
 						boolean valid = key.reset();
 						if (!valid) {
 							break;
 						}
 					}
+				}
+				if (!items.isEmpty()) {
+					publisher.publishEvent(new FileEvent(this, group, items));
 				}
 				register.cancel();
 			} catch (Exception e) {
@@ -166,6 +155,9 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 					log.info(e.getMessage(), e);
 				}
 				throw new RuntimeException(e);
+			}
+			if (log.isInfoEnabled()) {
+				log.info("Filewatcher {} done.", dir);
 			}
 		}
 	}
