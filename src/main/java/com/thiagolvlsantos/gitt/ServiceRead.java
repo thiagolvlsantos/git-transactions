@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.thiagolvlsantos.gitt.provider.IGitProvider;
@@ -16,7 +17,7 @@ public class ServiceRead {
 	private static final String GITT_EXAMPLE_PROJECTS = "projects";
 	private static final String GITT_EXAMPLE_PRODUCTS = "products";
 
-	private @Autowired IGitProvider provider;
+	private @Autowired ApplicationContext context;
 
 	@GitRead(GITT_EXAMPLE_PROJECTS)
 	public void read() throws IOException {
@@ -40,6 +41,7 @@ public class ServiceRead {
 	}
 
 	private void dumpRead(String msg) {
+		IGitProvider provider = context.getBean(IGitProvider.class);
 		File dir = provider.directoryRead(GITT_EXAMPLE_PROJECTS);
 		System.out.println(msg + "...readProjects..." + dir);
 		for (File f : dir.listFiles()) {

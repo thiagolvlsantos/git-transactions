@@ -1,5 +1,11 @@
 package com.thiagolvlsantos.gitt.id;
 
+import org.springframework.stereotype.Component;
+
+import com.thiagolvlsantos.gitt.scope.AspectScoped;
+
+@Component
+@AspectScoped
 public class SessionIdHolderTime implements ISessionIdHolder {
 
 	public static ISessionIdHolder INSTANCE = new SessionIdHolderTime();
@@ -12,10 +18,5 @@ public class SessionIdHolderTime implements ISessionIdHolder {
 			time = String.valueOf(System.currentTimeMillis());
 		}
 		return time;
-	}
-
-	@Override
-	public void clear() {
-		time = null;
 	}
 }

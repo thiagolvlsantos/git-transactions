@@ -15,9 +15,4 @@ public class SessionIdHolderThreadLocal implements ISessionIdHolder {
 		}
 		return id;
 	}
-
-	@Override
-	public void clear() {
-		ids.set(null);
-	}
 }

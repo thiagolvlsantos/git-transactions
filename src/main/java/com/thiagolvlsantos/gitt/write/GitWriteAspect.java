@@ -14,8 +14,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.thiagolvlsantos.gitt.id.SessionIdHolderHelper;
 import com.thiagolvlsantos.gitt.provider.IGitProvider;
+import com.thiagolvlsantos.gitt.scope.AspectScope;
 import com.thiagolvlsantos.gitt.watcher.EWatcherAction;
 import com.thiagolvlsantos.gitt.watcher.FileWatcherEvent;
 
@@ -29,10 +29,11 @@ public class GitWriteAspect {
 
 	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
-	private @Autowired IGitProvider provider;
 
 	@Around("@annotation(com.thiagolvlsantos.gitt.write.GitWrite)")
 	public Object write(ProceedingJoinPoint jp) throws Throwable {
+		AspectScope scope = context.getBean(AspectScope.class);
+		scope.openAspect();
 		Signature signature = jp.getSignature();
 		String name = signature.getName();
 		GitWrite annotation = getAnnotation(signature);
@@ -56,15 +57,19 @@ public class GitWriteAspect {
 			}
 			throw error;
 		} finally {
-			time = System.currentTimeMillis();
-			if (!annotation.value().isEmpty()) {
-				context.getBean(IGitProvider.class).cleanWrite(annotation.value());
+			try {
+				time = System.currentTimeMillis();
+				IGitProvider provider = context.getBean(IGitProvider.class);
+				if (!annotation.value().isEmpty()) {
+					provider.cleanWrite(annotation.value());
+				}
+				for (GitWriteDir d : annotation.values()) {
+					provider.cleanWrite(d.value());
+				}
+				log.info("** WRITE({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+			} finally {
+				scope.closeAspect();
 			}
-			for (GitWriteDir d : annotation.values()) {
-				context.getBean(IGitProvider.class).cleanWrite(d.value());
-			}
-			SessionIdHolderHelper.holder(context).clear();
-			log.info("** WRITE({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
 		}
 	}
 
@@ -76,6 +81,7 @@ public class GitWriteAspect {
 	}
 
 	private void startWatcher(GitWrite annotation) {
+		IGitProvider provider = context.getBean(IGitProvider.class);
 		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
 			Path path = provider.directoryWrite(group).toPath();
@@ -109,6 +115,7 @@ public class GitWriteAspect {
 	}
 
 	private void stopWatcher(GitWrite annotation) {
+		IGitProvider provider = context.getBean(IGitProvider.class);
 		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
 			Path path = provider.directoryWrite(group).toPath();

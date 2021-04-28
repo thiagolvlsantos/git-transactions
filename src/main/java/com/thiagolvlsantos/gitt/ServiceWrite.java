@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.thiagolvlsantos.gitt.provider.IGitProvider;
@@ -19,7 +20,7 @@ public class ServiceWrite {
 	private static final String GITT_EXAMPLE_PROJECTS = "projects";
 	private static final String GITT_EXAMPLE_PRODUCTS = "products";
 
-	private @Autowired IGitProvider provider;
+	private @Autowired ApplicationContext context;
 
 	@GitWrite(GITT_EXAMPLE_PROJECTS)
 	public void write() throws Exception {
@@ -43,6 +44,7 @@ public class ServiceWrite {
 	}
 
 	private void dumpWrite(String msg) throws FileNotFoundException, IOException {
+		IGitProvider provider = context.getBean(IGitProvider.class);
 		File dirProjects = provider.directoryWrite(GITT_EXAMPLE_PROJECTS);
 		File fileProjects = new File(dirProjects, "projectA.txt");
 		FileOutputStream outProjects = new FileOutputStream(fileProjects);

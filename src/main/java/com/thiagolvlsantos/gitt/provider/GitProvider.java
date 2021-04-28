@@ -21,12 +21,13 @@ import org.springframework.util.FileSystemUtils;
 
 import com.thiagolvlsantos.gitt.config.GittConfig;
 import com.thiagolvlsantos.gitt.id.SessionIdHolderHelper;
+import com.thiagolvlsantos.gitt.scope.AspectScoped;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-//TODO: should have REQUEST scope
+@AspectScoped
 public class GitProvider implements IGitProvider {
 
 	private static final String REPO_READ = "read";

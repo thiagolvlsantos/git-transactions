@@ -4,5 +4,4 @@ public interface ISessionIdHolder {
 
 	String current();
 
-	void clear();
 }

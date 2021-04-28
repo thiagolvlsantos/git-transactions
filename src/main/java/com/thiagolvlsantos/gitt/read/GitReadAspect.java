@@ -12,8 +12,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.thiagolvlsantos.gitt.id.SessionIdHolderHelper;
 import com.thiagolvlsantos.gitt.provider.IGitProvider;
+import com.thiagolvlsantos.gitt.scope.AspectScope;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +28,8 @@ public class GitReadAspect {
 
 	@Around("@annotation(com.thiagolvlsantos.gitt.read.GitRead)")
 	public Object read(ProceedingJoinPoint jp) throws Throwable {
+		AspectScope scope = context.getBean(AspectScope.class);
+		scope.openAspect();
 		Signature signature = jp.getSignature();
 		String name = signature.getName();
 		GitRead annotation = getAnnotation(signature);
@@ -50,15 +52,19 @@ public class GitReadAspect {
 			}
 			throw error;
 		} finally {
-			time = System.currentTimeMillis();
-			if (!annotation.value().isEmpty()) {
-				context.getBean(IGitProvider.class).cleanRead(annotation.value());
+			try {
+				time = System.currentTimeMillis();
+				IGitProvider provider = context.getBean(IGitProvider.class);
+				if (!annotation.value().isEmpty()) {
+					provider.cleanRead(annotation.value());
+				}
+				for (GitReadDir d : annotation.values()) {
+					provider.cleanRead(d.value());
+				}
+				log.info("** READ({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+			} finally {
+				scope.closeAspect();
 			}
-			for (GitReadDir d : annotation.values()) {
-				context.getBean(IGitProvider.class).cleanRead(d.value());
-			}
-			SessionIdHolderHelper.holder(context).clear();
-			log.info("** READ({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
 		}
 	}
 
