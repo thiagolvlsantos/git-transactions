@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+//TODO: should have REQUEST scope
 public class GitProvider implements IGitProvider {
 
 	private static final String REPO_READ = "read";
@@ -95,7 +96,7 @@ public class GitProvider implements IGitProvider {
 	@Override
 	public Git gitRead(String group) throws GitAPIException {
 		String key = keyRead(group);
-		return this.gitsRead.computeIfAbsent(key, (k) -> {
+		Git instance = this.gitsRead.computeIfAbsent(key, (k) -> {
 			try {
 				return instance(group, directoryRead(group));
 			} catch (Exception e) {
@@ -105,16 +106,20 @@ public class GitProvider implements IGitProvider {
 				throw new RuntimeException(e);
 			}
 		});
+		if (log.isInfoEnabled()) {
+			log.info("gitRead.keys: {}", this.gitsRead.keySet());
+		}
+		return instance;
 	}
 
-	private String keyRead(String group) {
+	public String keyRead(String group) {
 		return group;
 	}
 
 	@Override
 	public Git gitWrite(String group) throws GitAPIException {
 		String key = keyWrite(group);
-		return this.gitsWrite.computeIfAbsent(key, (k) -> {
+		Git instance = this.gitsWrite.computeIfAbsent(key, (k) -> {
 			try {
 				return instance(group, directoryWrite(group));
 			} catch (Exception e) {
@@ -124,9 +129,13 @@ public class GitProvider implements IGitProvider {
 				throw new RuntimeException(e);
 			}
 		});
+		if (log.isInfoEnabled()) {
+			log.info("gitWrite.keys: {}", this.gitsWrite.keySet());
+		}
+		return instance;
 	}
 
-	private String keyWrite(String group) {
+	public String keyWrite(String group) {
 		return group + "_" + SessionIdHolderHelper.holder(context).current();
 	}
 
@@ -151,17 +160,21 @@ public class GitProvider implements IGitProvider {
 
 	@Override
 	public PullResult pullRead(String group) throws GitAPIException {
+		return pull(group, gitRead(group), "pullRead");
+	}
+
+	private PullResult pull(String group, Git git, String msg) throws GitAPIException {
 		long time = System.currentTimeMillis();
-		PullResult pull = gitRead(group).pull().setCredentialsProvider(credentials(group)).call();
+		PullResult pull = git.pull().setCredentialsProvider(credentials(group)).call();
 		if (log.isInfoEnabled()) {
-			log.info("pullRead({}) time={}", group, System.currentTimeMillis() - time);
+			log.info(msg + "({}) time={}", group, System.currentTimeMillis() - time);
 		}
 		return pull;
 	}
 
 	@Override
 	public PullResult pullWrite(String group) throws GitAPIException {
-		PullResult result = pullRead(group);
+		pullRead(group);
 		long time = System.currentTimeMillis();
 		try {
 			FileSystemUtils.copyRecursively(directoryRead(group), directoryWrite(group));
@@ -172,9 +185,9 @@ public class GitProvider implements IGitProvider {
 			throw new RuntimeException(e);
 		}
 		if (log.isInfoEnabled()) {
-			log.info("pullWrite({}) time={}", group, System.currentTimeMillis() - time);
+			log.info("copy({}) time={}", group, System.currentTimeMillis() - time);
 		}
-		return result;
+		return pull(group, gitWrite(group), "pullWrite");
 	}
 
 	@Override
@@ -225,7 +238,9 @@ public class GitProvider implements IGitProvider {
 			log.info("cleanRead({}):{} NOP", key, dir);
 		}
 		Git git = this.gitsRead.remove(key);
-		git.close();
+		if (git != null) {
+			git.close();
+		}
 	}
 
 	@Override
@@ -236,7 +251,9 @@ public class GitProvider implements IGitProvider {
 			log.info("cleanWrite({}):{}", key, dir);
 		}
 		Git git = this.gitsWrite.remove(key);
-		git.close();
+		if (git != null) {
+			git.close();
+		}
 		try {
 			if (FileSystemUtils.deleteRecursively(dir.toPath())) {
 				if (log.isInfoEnabled()) {

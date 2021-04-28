@@ -35,6 +35,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 
 	private Map<String, Watcher> watchers = new HashMap<>();
 	private @Autowired ApplicationEventPublisher publisher;
+	private Thread shutdownHook;
 
 	@Override
 	public void onApplicationEvent(FileWatcherEvent event) {
@@ -51,6 +52,20 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 	}
 
 	public Watcher start(String group, Path dir) {
+		if (shutdownHook == null) {
+			shutdownHook = new Thread() {
+				@Override
+				public void run() {
+					for (Watcher w : watchers.values()) {
+						if (log.isInfoEnabled()) {
+							log.info("Shutdown:" + w.getName());
+						}
+						w.setActive(false);
+					}
+				}
+			};
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+		}
 		Watcher tmp = new Watcher(group, dir, true);
 		String key = key(group, dir);
 		watchers.compute(key, (k, v) -> {
@@ -82,11 +97,11 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		Watcher tmp = watchers.remove(key);
 		if (tmp != null) {
 			tmp.setActive(false);
-		}
-		try {
-			tmp.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			try {
+				tmp.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		if (log.isInfoEnabled()) {
 			log.info("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());

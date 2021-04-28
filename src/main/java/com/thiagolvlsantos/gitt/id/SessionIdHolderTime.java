@@ -2,14 +2,16 @@ package com.thiagolvlsantos.gitt.id;
 
 public class SessionIdHolderTime implements ISessionIdHolder {
 
-	private Long time;
+	public static ISessionIdHolder INSTANCE = new SessionIdHolderTime();
+
+	private String time;
 
 	@Override
 	public String current() {
 		if (time == null) {
-			time = System.currentTimeMillis();
+			time = String.valueOf(System.currentTimeMillis());
 		}
-		return String.valueOf(time);
+		return time;
 	}
 
 	@Override

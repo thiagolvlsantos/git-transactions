@@ -16,7 +16,7 @@ public interface IGitProvider {
 	File directoryWrite(String group);
 
 	String normalizeRead(String group, String filePattern);
-	
+
 	String normalizeWrite(String group, String filePattern);
 
 	CredentialsProvider credentials(String group);
@@ -24,6 +24,10 @@ public interface IGitProvider {
 	Git gitRead(String group) throws GitAPIException;
 
 	Git gitWrite(String group) throws GitAPIException;
+
+	String keyRead(String group);
+
+	String keyWrite(String group);
 
 	PullResult pullRead(String group) throws GitAPIException;
 

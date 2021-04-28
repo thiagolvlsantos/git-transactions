@@ -2,6 +2,8 @@ package com.thiagolvlsantos.gitt.id;
 
 public class SessionIdHolderThreadLocal implements ISessionIdHolder {
 
+	public static ISessionIdHolder INSTANCE = new SessionIdHolderThreadLocal();
+
 	private ThreadLocal<String> ids = new ThreadLocal<>();
 
 	@Override

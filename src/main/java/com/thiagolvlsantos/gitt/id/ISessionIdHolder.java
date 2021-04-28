@@ -5,6 +5,4 @@ public interface ISessionIdHolder {
 	String current();
 
 	void clear();
-
-	ISessionIdHolder INSTANCE = new SessionIdHolderTime();
 }
