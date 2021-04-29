@@ -78,7 +78,7 @@ public class GitProvider implements IGitProvider {
 
 	@Override
 	public String normalizeWrite(String group, String filename) {
-		return normalize(write(group), filename);
+		return normalize(write(group) + File.separator + SessionIdHolderHelper.holder(context).current(), filename);
 	}
 
 	private String normalize(String prefix, String filename) {
