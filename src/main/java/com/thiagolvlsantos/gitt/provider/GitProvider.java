@@ -96,10 +96,14 @@ public class GitProvider implements IGitProvider {
 
 	@Override
 	public Git gitRead(String group) throws GitAPIException {
+		return gitReadSilent(group, false);
+	}
+
+	public Git gitReadSilent(String group, boolean silent) throws GitAPIException {
 		String key = keyRead(group);
 		Git instance = this.gitsRead.computeIfAbsent(key, (k) -> {
 			try {
-				return instance(group, directoryRead(group));
+				return instance(group, directoryRead(group), silent);
 			} catch (Exception e) {
 				if (log.isDebugEnabled()) {
 					log.debug(e.getMessage(), e);
@@ -107,7 +111,7 @@ public class GitProvider implements IGitProvider {
 				throw new RuntimeException(e);
 			}
 		});
-		if (log.isDebugEnabled()) {
+		if (!silent && log.isDebugEnabled()) {
 			log.debug("gitRead.keys: {}", this.gitsRead.keySet());
 		}
 		return instance;
@@ -122,7 +126,7 @@ public class GitProvider implements IGitProvider {
 		String key = keyWrite(group);
 		Git instance = this.gitsWrite.computeIfAbsent(key, (k) -> {
 			try {
-				return instance(group, directoryWrite(group));
+				return instance(group, directoryWrite(group), false);
 			} catch (Exception e) {
 				if (log.isDebugEnabled()) {
 					log.debug(e.getMessage(), e);
@@ -141,9 +145,9 @@ public class GitProvider implements IGitProvider {
 	}
 
 	@SuppressWarnings("serial")
-	private Git instance(String group, File local) throws GitAPIException {
+	private Git instance(String group, File local, boolean silent) throws GitAPIException {
 		String remote = remote(group);
-		if (log.isInfoEnabled()) {
+		if (!silent && log.isInfoEnabled()) {
 			log.info("git({}): local:{}, remote:{}", group, local, remote);
 		}
 		try {
@@ -175,7 +179,7 @@ public class GitProvider implements IGitProvider {
 
 	@Override
 	public PullResult pullWrite(String group) throws GitAPIException {
-		pullRead(group);
+		pullReadSilent(group);
 		long time = System.currentTimeMillis();
 		try {
 			FileSystemUtils.copyRecursively(directoryRead(group), directoryWrite(group));
@@ -189,6 +193,10 @@ public class GitProvider implements IGitProvider {
 			log.debug("copy({}) time={}", group, System.currentTimeMillis() - time);
 		}
 		return pull(group, gitWrite(group), "pullWrite");
+	}
+
+	public PullResult pullReadSilent(String group) throws GitAPIException {
+		return pull(group, gitReadSilent(group, true), "pullReadSilent");
 	}
 
 	@Override
