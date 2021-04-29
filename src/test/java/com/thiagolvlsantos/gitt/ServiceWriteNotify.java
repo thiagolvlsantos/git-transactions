@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.thiagolvlsantos.gitt.file.EFileStatus;
-import com.thiagolvlsantos.gitt.file.FileServices;
+import com.thiagolvlsantos.gitt.provider.GitServices;
 import com.thiagolvlsantos.gitt.write.GitWrite;
 
 @Component
@@ -17,11 +17,11 @@ public class ServiceWriteNotify {
 
 	private static final String GITT_EXAMPLE_PROJECTS = "projects";
 
-	private @Autowired FileServices services;
+	private @Autowired GitServices services;
 
 	@GitWrite(value = GITT_EXAMPLE_PROJECTS, watcher = false)
 	public void write() throws IOException {
-		File directory = services.dirWrite(GITT_EXAMPLE_PROJECTS);
+		File directory = services.writeDirectory(GITT_EXAMPLE_PROJECTS);
 		System.out.println("...writeProjects..." + directory);
 		File file = new File(directory, "projectA.txt");
 		FileOutputStream out = new FileOutputStream(file);

@@ -1,4 +1,4 @@
-package com.thiagolvlsantos.gitt.file;
+package com.thiagolvlsantos.gitt.provider;
 
 import java.io.File;
 import java.util.Arrays;
@@ -10,19 +10,21 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.thiagolvlsantos.gitt.provider.IGitProvider;
+import com.thiagolvlsantos.gitt.file.EFileStatus;
+import com.thiagolvlsantos.gitt.file.FileEvent;
+import com.thiagolvlsantos.gitt.file.FileItem;
 
 @Component
-public class FileServices {
+public class GitServices {
 
 	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
 
-	public File dirRead(String group) {
+	public File readDirectory(String group) {
 		return context.getBean(IGitProvider.class).directoryRead(group);
 	}
 
-	public File dirWrite(String group) {
+	public File writeDirectory(String group) {
 		return context.getBean(IGitProvider.class).directoryWrite(group);
 	}
 

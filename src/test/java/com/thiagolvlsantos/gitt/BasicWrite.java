@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.thiagolvlsantos.gitt.file.FileServices;
+import com.thiagolvlsantos.gitt.provider.GitServices;
 import com.thiagolvlsantos.gitt.write.GitWrite;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BasicWrite {
 
-	private @Autowired FileServices services;
+	private @Autowired GitServices services;
 
 	@GitWrite("projects")
 	public void write() throws Exception {
-		File dirProjects = services.dirWrite("projects");
+		File dirProjects = services.writeDirectory("projects");
 		File newFile = new File(dirProjects, "projectA.txt");
 		if (log.isInfoEnabled()) {
 			log.info("BEFORE:" + Files.readString(newFile.toPath()));
