@@ -6,13 +6,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+
+import com.thiagolvlsantos.gitt.provider.IGitProvider;
 
 @Component
 public class FileServices {
 
+	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
+
+	public File dirRead(String group) {
+		return context.getBean(IGitProvider.class).directoryRead(group);
+	}
+
+	public File dirWrite(String group) {
+		return context.getBean(IGitProvider.class).directoryWrite(group);
+	}
 
 	public void notify(Object source, String group, EFileStatus state, File... files) {
 		if (group == null) {

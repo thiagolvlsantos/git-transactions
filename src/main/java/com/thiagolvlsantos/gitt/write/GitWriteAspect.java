@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 @Component
 @Slf4j
-@Order(0)
+@Order(10)
 public class GitWriteAspect {
 
 	private @Autowired ApplicationContext context;

@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.thiagolvlsantos.gitt.provider.IGitProvider;
+import com.thiagolvlsantos.gitt.file.FileServices;
 import com.thiagolvlsantos.gitt.read.GitRead;
 import com.thiagolvlsantos.gitt.read.GitReadDir;
 
@@ -17,7 +16,7 @@ public class ServiceRead {
 	private static final String GITT_EXAMPLE_PROJECTS = "projects";
 	private static final String GITT_EXAMPLE_PRODUCTS = "products";
 
-	private @Autowired ApplicationContext context;
+	private @Autowired FileServices services;
 
 	@GitRead(GITT_EXAMPLE_PROJECTS)
 	public void read() throws IOException {
@@ -41,15 +40,14 @@ public class ServiceRead {
 	}
 
 	private void dumpRead(String msg) {
-		IGitProvider provider = context.getBean(IGitProvider.class);
-		File dir = provider.directoryRead(GITT_EXAMPLE_PROJECTS);
+		File dir = services.dirRead(GITT_EXAMPLE_PROJECTS);
 		System.out.println(msg + "...readProjects..." + dir);
 		for (File f : dir.listFiles()) {
 			System.out.println(f.getName());
 		}
 
 		if (msg.equals("Mix") || msg.equals("Double")) {
-			dir = provider.directoryRead(GITT_EXAMPLE_PRODUCTS);
+			dir = services.dirRead(GITT_EXAMPLE_PRODUCTS);
 			System.out.println(msg + "...readProducts..." + dir);
 			for (File f : dir.listFiles()) {
 				System.out.println(f.getName());

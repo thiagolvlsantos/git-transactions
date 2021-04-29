@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.thiagolvlsantos.gitt.provider.IGitProvider;
+import com.thiagolvlsantos.gitt.file.FileServices;
 import com.thiagolvlsantos.gitt.read.GitRead;
 import com.thiagolvlsantos.gitt.read.GitReadDir;
 import com.thiagolvlsantos.gitt.write.GitWrite;
@@ -22,7 +21,7 @@ public class ServiceReadWrite {
 	private static final String GITT_EXAMPLE_PROJECTS = "projects";
 	private static final String GITT_EXAMPLE_PRODUCTS = "products";
 
-	private @Autowired ApplicationContext context;
+	private @Autowired FileServices services;
 
 	@GitWrite(value = GITT_EXAMPLE_PROJECTS, values = { //
 			@GitWriteDir(value = GITT_EXAMPLE_PRODUCTS) //
@@ -36,15 +35,14 @@ public class ServiceReadWrite {
 	}
 
 	private void dumpRead(String msg) {
-		IGitProvider provider = context.getBean(IGitProvider.class);
-		File dir = provider.directoryRead(GITT_EXAMPLE_PROJECTS);
+		File dir = services.dirRead(GITT_EXAMPLE_PROJECTS);
 		System.out.println(msg + "...readProjects..." + dir);
 		for (File f : dir.listFiles()) {
 			System.out.println(f.getName());
 		}
 
 		if (msg.equals("Mix") || msg.equals("Double")) {
-			dir = provider.directoryRead(GITT_EXAMPLE_PRODUCTS);
+			dir = services.dirRead(GITT_EXAMPLE_PRODUCTS);
 			System.out.println(msg + "...readProducts..." + dir);
 			for (File f : dir.listFiles()) {
 				System.out.println(f.getName());
@@ -53,8 +51,7 @@ public class ServiceReadWrite {
 	}
 
 	private void dumpWrite(String msg) throws FileNotFoundException, IOException {
-		IGitProvider provider = context.getBean(IGitProvider.class);
-		File dirProjects = provider.directoryWrite(GITT_EXAMPLE_PROJECTS);
+		File dirProjects = services.dirWrite(GITT_EXAMPLE_PROJECTS);
 		File fileProjects = new File(dirProjects, "projectA.txt");
 		FileOutputStream outProjects = new FileOutputStream(fileProjects);
 		outProjects.write(("{\"name\": \"projectA\", date: \"" + LocalDateTime.now() + "\"}").getBytes());
@@ -62,7 +59,7 @@ public class ServiceReadWrite {
 		System.out.println(msg + "...writeProjects..." + dirProjects + " DONE");
 
 		if (msg.equals("Mix") || msg.equals("Double")) {
-			File dirProducts = provider.directoryWrite(GITT_EXAMPLE_PRODUCTS);
+			File dirProducts = services.dirWrite(GITT_EXAMPLE_PRODUCTS);
 			File fileProducts = new File(dirProducts, "productA.txt");
 			FileOutputStream outProducts = new FileOutputStream(fileProducts);
 			outProducts.write(("{\"name\": \"productA\", date: \"" + LocalDateTime.now() + "\"}").getBytes());
