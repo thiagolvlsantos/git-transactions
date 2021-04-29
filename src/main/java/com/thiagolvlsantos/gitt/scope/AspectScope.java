@@ -19,7 +19,9 @@ public class AspectScope implements Scope {
 	public void openAspect() {
 		scope.add(new HashMap<>());
 		destruction.add(new HashMap<>());
-		log.info("Scope openned. scope={}, destruction={}", scope, destruction);
+		if (log.isDebugEnabled()) {
+			log.info("Scope openned.");
+		}
 	}
 
 	@Override
@@ -27,8 +29,8 @@ public class AspectScope implements Scope {
 		Object object = get(name);
 		if (object == null) {
 			object = objectFactory.getObject();
-			if (log.isInfoEnabled()) {
-				log.info("AspectScope put({},{})", name, object);
+			if (log.isDebugEnabled()) {
+				log.debug("AspectScope put({},{})", name, object);
 			}
 			put(name, object);
 		}
@@ -64,7 +66,12 @@ public class AspectScope implements Scope {
 				}
 			}
 		}
-		return current().remove(name);
+		for (int i = scope.size() - 1; i >= 0; i--) {
+			if (scope.get(i).containsKey(name)) {
+				return scope.get(i).remove(name);
+			}
+		}
+		return null;
 	}
 
 	private Runnable getD(String name) {
@@ -91,16 +98,16 @@ public class AspectScope implements Scope {
 
 	@Override
 	public Object resolveContextualObject(String key) {
-		if (log.isInfoEnabled()) {
-			log.info("Resolve contextual object: {}", key);
+		if (log.isTraceEnabled()) {
+			log.trace("Resolve contextual object: {}", key);
 		}
 		return null;
 	}
 
 	@Override
 	public String getConversationId() {
-		if (log.isInfoEnabled()) {
-			log.info("getConversationId()");
+		if (log.isTraceEnabled()) {
+			log.trace("getConversationId()");
 		}
 		return null;
 	}
@@ -108,8 +115,8 @@ public class AspectScope implements Scope {
 	public void closeAspect() {
 		scope.remove(scope.size() - 1);
 		destruction.remove(destruction.size() - 1);
-		if (log.isInfoEnabled()) {
-			log.info("Scope closed.");
+		if (log.isDebugEnabled()) {
+			log.debug("Scope closed.");
 		}
 	}
 }

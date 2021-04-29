@@ -66,7 +66,9 @@ public class GitWriteAspect {
 				for (GitWriteDir d : annotation.values()) {
 					provider.cleanWrite(d.value());
 				}
-				log.info("** WRITE({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				if (log.isInfoEnabled()) {
+					log.info("** WRITE({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				}
 			} finally {
 				scope.closeAspect();
 			}

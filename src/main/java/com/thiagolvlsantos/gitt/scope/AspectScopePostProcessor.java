@@ -6,6 +6,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 public class AspectScopePostProcessor implements BeanFactoryPostProcessor {
 
+	public static final String ASPECT_SCOPE_NAME = "aspect";
 	private static AspectScope instance = new AspectScope();
 
 	public AspectScope instance() {
@@ -14,6 +15,6 @@ public class AspectScopePostProcessor implements BeanFactoryPostProcessor {
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
-		factory.registerScope("aspect", instance);
+		factory.registerScope(ASPECT_SCOPE_NAME, instance);
 	}
 }

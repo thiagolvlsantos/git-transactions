@@ -61,7 +61,9 @@ public class GitReadAspect {
 				for (GitReadDir d : annotation.values()) {
 					provider.cleanRead(d.value());
 				}
-				log.info("** READ({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				if (log.isInfoEnabled()) {
+					log.info("** READ({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				}
 			} finally {
 				scope.closeAspect();
 			}

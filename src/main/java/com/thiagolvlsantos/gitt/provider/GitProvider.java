@@ -107,8 +107,8 @@ public class GitProvider implements IGitProvider {
 				throw new RuntimeException(e);
 			}
 		});
-		if (log.isInfoEnabled()) {
-			log.info("gitRead.keys: {}", this.gitsRead.keySet());
+		if (log.isDebugEnabled()) {
+			log.debug("gitRead.keys: {}", this.gitsRead.keySet());
 		}
 		return instance;
 	}
@@ -130,8 +130,8 @@ public class GitProvider implements IGitProvider {
 				throw new RuntimeException(e);
 			}
 		});
-		if (log.isInfoEnabled()) {
-			log.info("gitWrite.keys: {}", this.gitsWrite.keySet());
+		if (log.isDebugEnabled()) {
+			log.debug("gitWrite.keys: {}", this.gitsWrite.keySet());
 		}
 		return instance;
 	}
@@ -167,8 +167,8 @@ public class GitProvider implements IGitProvider {
 	private PullResult pull(String group, Git git, String msg) throws GitAPIException {
 		long time = System.currentTimeMillis();
 		PullResult pull = git.pull().setCredentialsProvider(credentials(group)).call();
-		if (log.isInfoEnabled()) {
-			log.info(msg + "({}) time={}", group, System.currentTimeMillis() - time);
+		if (log.isDebugEnabled()) {
+			log.debug(msg + "({}) time={}", group, System.currentTimeMillis() - time);
 		}
 		return pull;
 	}
@@ -185,8 +185,8 @@ public class GitProvider implements IGitProvider {
 			}
 			throw new RuntimeException(e);
 		}
-		if (log.isInfoEnabled()) {
-			log.info("copy({}) time={}", group, System.currentTimeMillis() - time);
+		if (log.isDebugEnabled()) {
+			log.debug("copy({}) time={}", group, System.currentTimeMillis() - time);
 		}
 		return pull(group, gitWrite(group), "pullWrite");
 	}
@@ -205,8 +205,8 @@ public class GitProvider implements IGitProvider {
 		IGitAudit audit = GitAuditHelper.audit(context);
 		long time = System.currentTimeMillis();
 		RevCommit call = git.commit().setAuthor(audit.username(), audit.email()).setMessage(msg).call();
-		if (log.isInfoEnabled()) {
-			log.info("commit({}) time={}: {}, {} -> {}", group, System.currentTimeMillis() - time, audit.username(),
+		if (log.isDebugEnabled()) {
+			log.debug("commit({}) time={}: {}, {} -> {}", group, System.currentTimeMillis() - time, audit.username(),
 					audit.email(), msg);
 		}
 		return call;
@@ -225,32 +225,31 @@ public class GitProvider implements IGitProvider {
 	private Iterable<PushResult> push(String group, Git git, String msg) throws GitAPIException {
 		long time = System.currentTimeMillis();
 		Iterable<PushResult> call = git.push().setCredentialsProvider(credentials(group)).call();
-		if (log.isInfoEnabled()) {
-			log.info(msg + "({}) time={}", group, System.currentTimeMillis() - time);
+		if (log.isDebugEnabled()) {
+			log.debug(msg + "({}) time={}", group, System.currentTimeMillis() - time);
 		}
 		return call;
 	}
 
 	@Override
 	public void cleanRead(String group) throws GitAPIException {
+		long time = System.currentTimeMillis();
 		String key = keyRead(group);
 		File dir = directoryRead(group);
-		if (log.isInfoEnabled()) {
-			log.info("cleanRead({}):{} NOP", key, dir);
-		}
 		Git git = this.gitsRead.remove(key);
 		if (git != null) {
 			git.close();
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("cleanRead({}):{} NOP time={}", key, dir, System.currentTimeMillis() - time);
 		}
 	}
 
 	@Override
 	public void cleanWrite(String group) throws GitAPIException {
+		long time = System.currentTimeMillis();
 		String key = keyWrite(group);
 		File dir = directoryWrite(group);
-		if (log.isInfoEnabled()) {
-			log.info("cleanWrite({}):{}", key, dir);
-		}
 		Git git = this.gitsWrite.remove(key);
 		if (git != null) {
 			git.close();
@@ -258,7 +257,7 @@ public class GitProvider implements IGitProvider {
 		try {
 			if (FileSystemUtils.deleteRecursively(dir.toPath())) {
 				if (log.isInfoEnabled()) {
-					log.info("cleanWrite failure.");
+					log.info("cleanWrite recursive clean ok.");
 				}
 			}
 		} catch (IOException e) {
@@ -266,7 +265,9 @@ public class GitProvider implements IGitProvider {
 				log.error(e.getMessage());
 			}
 		}
-
+		if (log.isDebugEnabled()) {
+			log.debug("cleanWrite({}):{} NOP time={}", key, dir, System.currentTimeMillis() - time);
+		}
 	}
 
 	@Override
@@ -280,9 +281,11 @@ public class GitProvider implements IGitProvider {
 	}
 
 	private Iterable<RevCommit> log(String group, String path, Git git) throws GitAPIException {
-		if (log.isInfoEnabled()) {
-			log.info("log({}):{}", group, path);
+		long time = System.currentTimeMillis();
+		Iterable<RevCommit> call = git.log().call();
+		if (log.isDebugEnabled()) {
+			log.debug("log({}):{}, time={}", group, path, System.currentTimeMillis() - time);
 		}
-		return git.log().call();
+		return call;
 	}
 }

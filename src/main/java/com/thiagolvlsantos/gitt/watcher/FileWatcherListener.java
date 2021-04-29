@@ -82,8 +82,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 				e.printStackTrace();
 			}
 		}
-		if (log.isInfoEnabled()) {
-			log.info("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
+		if (log.isDebugEnabled()) {
+			log.debug("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		}
 		return tmp;
 	}
@@ -103,8 +103,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 				e.printStackTrace();
 			}
 		}
-		if (log.isInfoEnabled()) {
-			log.info("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
+		if (log.isDebugEnabled()) {
+			log.debug("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		}
 		return tmp;
 	}
@@ -150,8 +150,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 								}
 								items.add(item);
 							} else {
-								if (log.isInfoEnabled()) {
-									log.info("Ignore:" + file);
+								if (log.isDebugEnabled()) {
+									log.debug("Ignore:" + file);
 								}
 							}
 						}

@@ -1,9 +1,11 @@
 package com.thiagolvlsantos.gitt.file;
 
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("test")
 public class FileListenerPrint implements ApplicationListener<FileEvent> {
 
 	@Override
