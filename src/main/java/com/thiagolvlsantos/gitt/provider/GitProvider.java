@@ -262,20 +262,23 @@ public class GitProvider implements IGitProvider {
 		if (git != null) {
 			git.close();
 		}
-		try {
-			if (FileSystemUtils.deleteRecursively(dir.toPath())) {
-				if (log.isInfoEnabled()) {
-					log.info("cleanWrite recursive clean ok.");
-				}
-			}
-		} catch (IOException e) {
-			if (log.isErrorEnabled()) {
-				log.error(e.getMessage());
-			}
+		boolean delete = delete(dir);
+		if (!delete && log.isInfoEnabled()) {
+			log.info("Could not delete: {}", dir);
 		}
 		if (log.isDebugEnabled()) {
-			log.debug("cleanWrite({}):{} NOP time={}", key, dir, System.currentTimeMillis() - time);
+			log.debug("cleanWrite(success:{},{}):{} NOP time={}", delete, key, dir, System.currentTimeMillis() - time);
 		}
+	}
+
+	private boolean delete(File f) {
+		boolean ok = true;
+		if (f.isDirectory()) {
+			for (File c : f.listFiles()) {
+				ok = ok & delete(c);
+			}
+		}
+		return ok & f.delete();
 	}
 
 	@Override
