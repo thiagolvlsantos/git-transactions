@@ -13,7 +13,7 @@ public class SessionIdHolderHelper {
 		try {
 			sessionHolder = context.getBean(ISessionIdHolder.class);
 		} catch (NoSuchBeanDefinitionException e) {
-			sessionHolder = SessionIdHolderTime.INSTANCE;
+			sessionHolder = SessionIdHolderDefault.INSTANCE;
 		}
 		return sessionHolder;
 	}

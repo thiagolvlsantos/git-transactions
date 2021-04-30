@@ -16,19 +16,16 @@ import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 
 import com.thiagolvlsantos.gitt.config.GittConfig;
+import com.thiagolvlsantos.gitt.file.FileUtils;
 import com.thiagolvlsantos.gitt.id.SessionIdHolderHelper;
-import com.thiagolvlsantos.gitt.scope.AspectScoped;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
-@AspectScoped
-public class GitProvider implements IGitProvider {
+public abstract class AbstractGitProvider implements IGitProvider {
 
 	private static final String REPO_READ = "read";
 	private static final String REPO_WRITE = "write";
@@ -40,7 +37,7 @@ public class GitProvider implements IGitProvider {
 	private Map<String, Git> gitsRead = new ConcurrentHashMap<>();
 	private Map<String, Git> gitsWrite = new ConcurrentHashMap<>();
 
-	private String property(String group, String name) {
+	protected String property(String group, String name) {
 		GittConfig config = context.getBean(GittConfig.class);
 		String tmp = config.get(group + "." + name);
 		if (tmp == null) {
@@ -49,15 +46,15 @@ public class GitProvider implements IGitProvider {
 		return tmp;
 	}
 
-	private String read(String group) {
+	protected String read(String group) {
 		return String.format(property(group, REPO_READ), group);
 	}
 
-	private String write(String group) {
+	protected String write(String group) {
 		return String.format(property(group, REPO_WRITE), group);
 	}
 
-	private String remote(String group) {
+	protected String remote(String group) {
 		return String.format(property(group, REPO_REMOTE), group);
 	}
 
@@ -81,7 +78,7 @@ public class GitProvider implements IGitProvider {
 		return normalize(write(group) + File.separator + SessionIdHolderHelper.holder(context).current(), filename);
 	}
 
-	private String normalize(String prefix, String filename) {
+	protected String normalize(String prefix, String filename) {
 		prefix = prefix.replace("\\", "/");
 		return filename == null ? null : filename.replace("\\", "/").replace(prefix + "/", "");
 	}
@@ -145,7 +142,7 @@ public class GitProvider implements IGitProvider {
 	}
 
 	@SuppressWarnings("serial")
-	private Git instance(String group, File local, boolean silent) throws GitAPIException {
+	protected Git instance(String group, File local, boolean silent) throws GitAPIException {
 		String remote = remote(group);
 		if (!silent && log.isInfoEnabled()) {
 			log.info("git({}): local:{}, remote:{}", group, local, remote);
@@ -168,7 +165,7 @@ public class GitProvider implements IGitProvider {
 		return pull(group, gitRead(group), "pullRead");
 	}
 
-	private PullResult pull(String group, Git git, String msg) throws GitAPIException {
+	protected PullResult pull(String group, Git git, String msg) throws GitAPIException {
 		long time = System.currentTimeMillis();
 		PullResult pull = git.pull().setCredentialsProvider(credentials(group)).call();
 		if (log.isDebugEnabled()) {
@@ -209,7 +206,7 @@ public class GitProvider implements IGitProvider {
 		return commit(group, msg, gitWrite(group));
 	}
 
-	private RevCommit commit(String group, String msg, Git git) throws GitAPIException {
+	protected RevCommit commit(String group, String msg, Git git) throws GitAPIException {
 		IGitAudit audit = GitAuditHelper.audit(context);
 		long time = System.currentTimeMillis();
 		RevCommit call = git.commit().setAuthor(audit.username(), audit.email()).setMessage(msg).call();
@@ -230,7 +227,7 @@ public class GitProvider implements IGitProvider {
 		return push(group, gitWrite(group), "pushWrite");
 	}
 
-	private Iterable<PushResult> push(String group, Git git, String msg) throws GitAPIException {
+	protected Iterable<PushResult> push(String group, Git git, String msg) throws GitAPIException {
 		long time = System.currentTimeMillis();
 		Iterable<PushResult> call = git.push().setCredentialsProvider(credentials(group)).call();
 		if (log.isDebugEnabled()) {
@@ -262,23 +259,13 @@ public class GitProvider implements IGitProvider {
 		if (git != null) {
 			git.close();
 		}
-		boolean delete = delete(dir);
+		boolean delete = FileUtils.delete(dir);
 		if (!delete && log.isInfoEnabled()) {
 			log.info("Could not delete: {}", dir);
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("cleanWrite(success:{},{}):{} NOP time={}", delete, key, dir, System.currentTimeMillis() - time);
 		}
-	}
-
-	private boolean delete(File f) {
-		boolean ok = true;
-		if (f.isDirectory()) {
-			for (File c : f.listFiles()) {
-				ok = ok & delete(c);
-			}
-		}
-		return ok & f.delete();
 	}
 
 	@Override
