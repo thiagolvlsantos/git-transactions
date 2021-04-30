@@ -36,19 +36,19 @@ public class GitReadAspect {
 		long time = System.currentTimeMillis();
 		init(jp, annotation);
 		if (log.isInfoEnabled()) {
-			log.info("** READ({}).init: {}, ({}) **", name, System.currentTimeMillis() - time, annotation);
+			log.info("** READ({}).init: {} ms, ({}) **", name, System.currentTimeMillis() - time, annotation);
 		}
 		try {
 			time = System.currentTimeMillis();
 			Object result = success(jp, annotation, jp.proceed());
 			if (log.isInfoEnabled()) {
-				log.info("** READ({}).success: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				log.info("** READ({}).success: {} ms **", name, System.currentTimeMillis() - time);
 			}
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, annotation, e);
 			if (log.isInfoEnabled()) {
-				log.info("** READ({}).failure: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				log.info("** READ({}).failure: {} ms **", name, System.currentTimeMillis() - time);
 			}
 			throw error;
 		} finally {
@@ -62,7 +62,7 @@ public class GitReadAspect {
 					provider.cleanRead(d.value());
 				}
 				if (log.isInfoEnabled()) {
-					log.info("** READ({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+					log.info("** READ({}).finalyze: {} ms **", name, System.currentTimeMillis() - time);
 				}
 			} finally {
 				scope.closeAspect();

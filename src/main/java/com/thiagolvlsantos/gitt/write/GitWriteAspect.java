@@ -41,19 +41,19 @@ public class GitWriteAspect {
 		init(jp, annotation);
 		startWatcher(annotation);
 		if (log.isInfoEnabled()) {
-			log.info("** WRITE({}).init: {}, {} **", name, System.currentTimeMillis() - time, annotation);
+			log.info("** WRITE({}).init: {} ms, {} **", name, System.currentTimeMillis() - time, annotation);
 		}
 		try {
 			time = System.currentTimeMillis();
 			Object result = success(jp, annotation, jp.proceed());
 			if (log.isInfoEnabled()) {
-				log.info("** WRITE({}).success: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				log.info("** WRITE({}).success: {} ms **", name, System.currentTimeMillis() - time);
 			}
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, annotation, e);
 			if (log.isInfoEnabled()) {
-				log.info("** WRITE({}).failure: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+				log.info("** WRITE({}).failure: {} ms **", name, System.currentTimeMillis() - time);
 			}
 			throw error;
 		} finally {
@@ -67,7 +67,7 @@ public class GitWriteAspect {
 					provider.cleanWrite(d.value());
 				}
 				if (log.isInfoEnabled()) {
-					log.info("** WRITE({}).finalyze: {} ({}) **", name, System.currentTimeMillis() - time, annotation);
+					log.info("** WRITE({}).finalyze: {} ms **", name, System.currentTimeMillis() - time);
 				}
 			} finally {
 				scope.closeAspect();

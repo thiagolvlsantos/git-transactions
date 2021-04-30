@@ -171,8 +171,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 				}
 				throw new RuntimeException(e);
 			}
-			if (log.isInfoEnabled()) {
-				log.info("Filewatcher {} done.", dir);
+			if (log.isDebugEnabled()) {
+				log.debug("Filewatcher {} done.", dir);
 			}
 		}
 	}
