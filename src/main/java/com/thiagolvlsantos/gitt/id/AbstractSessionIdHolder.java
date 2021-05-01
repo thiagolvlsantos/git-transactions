@@ -15,7 +15,7 @@ public abstract class AbstractSessionIdHolder implements ISessionIdHolder {
 		if (time == null) {
 			time = String.valueOf(System.currentTimeMillis());
 			if (log.isInfoEnabled()) {
-				log.info("ID={}", time);
+				log.info("{}.ID={}", getClass().getName(), time);
 			}
 		}
 		return time;

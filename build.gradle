@@ -21,12 +21,12 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
-	implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+	implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
 }
 
 test {
