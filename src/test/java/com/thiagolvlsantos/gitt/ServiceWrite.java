@@ -28,15 +28,15 @@ public class ServiceWrite {
 
 	@GitWrite(value = GITT_EXAMPLE_PROJECTS, //
 			values = { //
-					@GitWriteDir(value = GITT_EXAMPLE_PRODUCTS) //
+					@GitWriteDir(GITT_EXAMPLE_PRODUCTS) //
 			})
 	public void writeMix() throws Exception {
 		dumpWrite("Mix");
 	}
 
 	@GitWrite(values = { //
-			@GitWriteDir(value = GITT_EXAMPLE_PROJECTS), //
-			@GitWriteDir(value = GITT_EXAMPLE_PRODUCTS) //
+			@GitWriteDir(GITT_EXAMPLE_PROJECTS), //
+			@GitWriteDir(GITT_EXAMPLE_PRODUCTS) //
 	})
 	public void writeDouble() throws Exception {
 		dumpWrite("Double");
