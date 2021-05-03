@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 import com.thiagolvlsantos.gitt.file.EFileStatus;
 import com.thiagolvlsantos.gitt.file.FileEvent;
 import com.thiagolvlsantos.gitt.file.FileItem;
+
+import lombok.SneakyThrows;
 
 @Component
 public class GitServices {
@@ -41,5 +44,10 @@ public class GitServices {
 		List<FileItem> items = Arrays.asList(files).stream().map(f -> new FileItem(f, state))
 				.collect(Collectors.toList());
 		publisher.publishEvent(new FileEvent(source, group, items));
+	}
+
+	@SneakyThrows
+	public Iterable<RevCommit> history(String group, Object key) {
+		return context.getBean(IGitProvider.class).logRead(group, String.valueOf(key));
 	}
 }

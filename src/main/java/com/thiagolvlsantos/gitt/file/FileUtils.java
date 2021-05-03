@@ -7,6 +7,10 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class FileUtils {
 
+	public static boolean mkdirs(File dir) {
+		return dir.mkdirs();
+	}
+
 	public static boolean delete(File f) {
 		boolean ok = true;
 		if (f.isDirectory()) {
