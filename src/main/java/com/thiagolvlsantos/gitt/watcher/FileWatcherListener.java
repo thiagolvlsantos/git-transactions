@@ -122,7 +122,6 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		private Path dir;
 		private boolean active;
 
-		@SuppressWarnings("unchecked")
 		public void run() {
 			try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
 				Map<WatchKey, Path> registers = new HashMap<>();
@@ -177,7 +176,11 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			if (key != null) {
 				for (WatchEvent<?> event : key.pollEvents()) {
 					WatchEvent.Kind<?> kind = event.kind();
+					WatchEvent<Path> ev = (WatchEvent<Path>) event;
 					if (kind == OVERFLOW) {
+						if (log.isInfoEnabled()) {
+							log.info("OVERFLOW:" + ev.context());
+						}
 						continue;
 					}
 					EFileStatus status = null;
@@ -191,7 +194,6 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 						status = EFileStatus.DELETE;
 					}
 					Path parent = registers.get(key);
-					WatchEvent<Path> ev = (WatchEvent<Path>) event;
 					Path filename = ev.context();
 					Path child = parent.resolve(filename);
 					File file = child.toFile();
