@@ -6,11 +6,16 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,8 +87,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 				e.printStackTrace();
 			}
 		}
-		if (log.isDebugEnabled()) {
-			log.debug("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
+		if (log.isInfoEnabled()) {
+			log.info("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		}
 		return tmp;
 	}
@@ -103,8 +108,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 				e.printStackTrace();
 			}
 		}
-		if (log.isDebugEnabled()) {
-			log.debug("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
+		if (log.isInfoEnabled()) {
+			log.info("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		}
 		return tmp;
 	}
@@ -119,52 +124,38 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		@SuppressWarnings("unchecked")
 		public void run() {
 			try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
-				WatchKey register = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+				Map<WatchKey, Path> registers = new HashMap<>();
+				Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+					@Override
+					public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attrs) throws IOException {
+						if (String.valueOf(p).endsWith(".git")) {
+							return FileVisitResult.SKIP_SUBTREE;
+						}
+						registers.put(p.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY, OVERFLOW), p);
+						if (log.isInfoEnabled()) {
+							log.info("WATCH: " + p);
+						}
+						return FileVisitResult.CONTINUE;
+					}
+
+				});
 				List<FileItem> items = new LinkedList<>();
 				while (active) {
 					WatchKey key = watcher.poll();
-					if (key != null && active) {
-						for (WatchEvent<?> event : key.pollEvents()) {
-							WatchEvent.Kind<?> kind = event.kind();
-							if (kind == OVERFLOW) {
-								continue;
-							}
-							EFileStatus status = null;
-							if (kind == ENTRY_CREATE) {
-								status = EFileStatus.CREATE;
-							}
-							if (kind == ENTRY_MODIFY) {
-								status = EFileStatus.MODIFY;
-							}
-							if (kind == ENTRY_DELETE) {
-								status = EFileStatus.DELETE;
-							}
-							WatchEvent<Path> ev = (WatchEvent<Path>) event;
-							Path filename = ev.context();
-							Path child = dir.resolve(filename);
-							File file = child.toFile();
-							if (!file.toString().contains(".git")) {
-								FileItem item = new FileItem(file, status);
-								if (log.isInfoEnabled()) {
-									log.info(status + ":" + item);
-								}
-								items.add(item);
-							} else {
-								if (log.isDebugEnabled()) {
-									log.debug("Ignore:" + file);
-								}
-							}
-						}
-						boolean valid = key.reset();
-						if (!valid) {
-							break;
-						}
+					if (!process(watcher, registers, key, items)) {
+						break;
 					}
+				}
+				for (WatchKey key : registers.keySet()) {
+					key.cancel();
+					if (log.isInfoEnabled()) {
+						log.info("Remaining events: " + registers.get(key));
+					}
+					process(watcher, registers, key, items);
 				}
 				if (!items.isEmpty()) {
 					publisher.publishEvent(new FileEvent(this, group, items));
 				}
-				register.cancel();
 			} catch (Exception e) {
 				if (log.isInfoEnabled()) {
 					log.info(e.getMessage(), e);
@@ -174,6 +165,66 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			if (log.isDebugEnabled()) {
 				log.debug("Filewatcher {} done.", dir);
 			}
+		}
+
+		@SuppressWarnings("unchecked")
+		private boolean process(WatchService watcher, Map<WatchKey, Path> registers, WatchKey key, List<FileItem> items)
+				throws IOException {
+			if (key != null) {
+				for (WatchEvent<?> event : key.pollEvents()) {
+					WatchEvent.Kind<?> kind = event.kind();
+					if (kind == OVERFLOW) {
+						continue;
+					}
+					EFileStatus status = null;
+					if (kind == ENTRY_CREATE) {
+						status = EFileStatus.CREATE;
+					}
+					if (kind == ENTRY_MODIFY) {
+						status = EFileStatus.MODIFY;
+					}
+					if (kind == ENTRY_DELETE) {
+						status = EFileStatus.DELETE;
+					}
+					Path parent = registers.get(key);
+					WatchEvent<Path> ev = (WatchEvent<Path>) event;
+					Path filename = ev.context();
+					Path child = parent.resolve(filename);
+					File file = child.toFile();
+					if (!file.toString().contains(".git")) {
+						FileItem item = new FileItem(file, status);
+						if (log.isInfoEnabled()) {
+							log.info(status + ":" + item);
+						}
+						items.add(item);
+						if (file.isDirectory()) {
+							switch (status) {
+							case CREATE:
+								registers.put(child.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), child);
+								if (log.isInfoEnabled()) {
+									log.info("watcher added:" + child);
+								}
+								break;
+							case MODIFY:
+								break;
+							case DELETE:
+								registers.remove(key);
+								key.cancel();
+								if (log.isInfoEnabled()) {
+									log.info("watcher removed:" + key);
+								}
+								break;
+							}
+						}
+					} else {
+						if (log.isDebugEnabled()) {
+							log.debug("Ignore:" + file);
+						}
+					}
+				}
+				return key.reset();
+			}
+			return true;
 		}
 	}
 }
