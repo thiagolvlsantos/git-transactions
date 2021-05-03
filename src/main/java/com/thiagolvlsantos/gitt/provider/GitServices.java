@@ -31,6 +31,18 @@ public class GitServices {
 		return context.getBean(IGitProvider.class).directoryWrite(group);
 	}
 
+	public void created(Object source, String group, File... files) {
+		notify(source, group, EFileStatus.CREATE, files);
+	}
+
+	public void modified(Object source, String group, File... files) {
+		notify(source, group, EFileStatus.MODIFY, files);
+	}
+
+	public void deleted(Object source, String group, File... files) {
+		notify(source, group, EFileStatus.DELETE, files);
+	}
+
 	public void notify(Object source, String group, EFileStatus state, File... files) {
 		if (group == null) {
 			throw new IllegalArgumentException("Group should be not null.");

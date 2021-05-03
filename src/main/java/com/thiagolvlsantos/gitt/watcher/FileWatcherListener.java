@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import com.sun.nio.file.SensitivityWatchEventModifier;
 import com.thiagolvlsantos.gitt.file.EFileStatus;
 import com.thiagolvlsantos.gitt.file.FileEvent;
 import com.thiagolvlsantos.gitt.file.FileItem;
@@ -131,7 +132,10 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 						if (String.valueOf(p).endsWith(".git")) {
 							return FileVisitResult.SKIP_SUBTREE;
 						}
-						registers.put(p.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY, OVERFLOW), p);
+						registers.put(
+								p.register(watcher, new WatchEvent.Kind[] { ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY },
+										SensitivityWatchEventModifier.HIGH),
+								p);
 						if (log.isInfoEnabled()) {
 							log.info("WATCH: " + p);
 						}
@@ -200,7 +204,9 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 						if (file.isDirectory()) {
 							switch (status) {
 							case CREATE:
-								registers.put(child.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), child);
+								registers.put(child.register(watcher,
+										new WatchEvent.Kind[] { ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY },
+										SensitivityWatchEventModifier.HIGH), child);
 								if (log.isInfoEnabled()) {
 									log.info("watcher added:" + child);
 								}
