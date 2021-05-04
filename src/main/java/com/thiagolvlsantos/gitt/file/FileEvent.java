@@ -1,5 +1,6 @@
 package com.thiagolvlsantos.gitt.file;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.context.ApplicationEvent;
@@ -18,5 +19,11 @@ public class FileEvent extends ApplicationEvent {
 		super(source);
 		this.group = group;
 		this.items = items;
+	}
+
+	public FileEvent(Object source, String group, FileItem... items) {
+		super(source);
+		this.group = group;
+		this.items = Arrays.asList(items);
 	}
 }

@@ -27,6 +27,7 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
+	implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
 }
 
 test {
