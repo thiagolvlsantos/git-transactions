@@ -23,14 +23,14 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 	public void onApplicationEvent(GitReadEvent event) {
 		try {
 			IGitProvider provider = context.getBean(IGitProvider.class);
-			GitRead annotation = event.getAnnotation();
+			GitReadDynamic annotation = event.getAnnotation();
 			List<String> gs = new LinkedList<>();
 			String group = annotation.value();
 			if (!group.isEmpty()) {
 				gs.add(group);
 			}
-			GitReadDir[] values = annotation.values();
-			for (GitReadDir v : values) {
+			GitReadDirDynamic[] values = annotation.values();
+			for (GitReadDirDynamic v : values) {
 				gs.add(v.value());
 			}
 			for (String g : gs) {

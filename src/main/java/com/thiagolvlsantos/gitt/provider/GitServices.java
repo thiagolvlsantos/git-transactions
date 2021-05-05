@@ -1,6 +1,7 @@
 package com.thiagolvlsantos.gitt.provider;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,12 +24,31 @@ public class GitServices {
 	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
 
+	public String renamedGroup(String group, Class<? extends IGitRouter> router, Object... args)
+			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		String value = group;
+		if (router != IGitRouter.class) {
+			value = value + IGitRouter.SEPARATOR + router.getDeclaredConstructor().newInstance().qualifier(group, args);
+		}
+		return value;
+	}
+
 	public File readDirectory(String group) {
 		return context.getBean(IGitProvider.class).directoryRead(group);
 	}
 
+	@SneakyThrows
+	public File readDirectory(String group, Class<? extends IGitRouter> router, Object... args) {
+		return readDirectory(renamedGroup(group, router, args));
+	}
+
 	public File writeDirectory(String group) {
 		return context.getBean(IGitProvider.class).directoryWrite(group);
+	}
+
+	@SneakyThrows
+	public File writeDirectory(String group, Class<? extends IGitRouter> router, Object... args) {
+		return writeDirectory(renamedGroup(group, router, args));
 	}
 
 	public void created(Object source, String group, File... files) {

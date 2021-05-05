@@ -10,6 +10,4 @@ import java.lang.annotation.Target;
 public @interface GitReadDir {
 
 	String value();
-
-	boolean watcher() default false;
 }

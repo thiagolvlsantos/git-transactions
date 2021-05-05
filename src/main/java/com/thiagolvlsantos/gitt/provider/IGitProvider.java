@@ -48,4 +48,5 @@ public interface IGitProvider {
 	Iterable<RevCommit> logRead(String group, String path) throws GitAPIException;
 
 	Iterable<RevCommit> logWrite(String group, String path) throws GitAPIException;
+
 }
