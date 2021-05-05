@@ -5,6 +5,8 @@
     </encoder>
   </appender>
 
+  <logger name="com.thiagolvlsantos" level="INFO" /> 
+
   <root level="INFO">
     <appender-ref ref="STDOUT" />
   </root>

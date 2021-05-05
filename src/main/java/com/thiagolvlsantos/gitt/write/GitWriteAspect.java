@@ -1,6 +1,9 @@
 package com.thiagolvlsantos.gitt.write;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -15,10 +18,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.thiagolvlsantos.gitt.provider.IGitProvider;
+import com.thiagolvlsantos.gitt.provider.IGitRouter;
 import com.thiagolvlsantos.gitt.scope.AspectScope;
 import com.thiagolvlsantos.gitt.watcher.EWatcherAction;
 import com.thiagolvlsantos.gitt.watcher.FileWatcherEvent;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Aspect
@@ -36,34 +41,34 @@ public class GitWriteAspect {
 		scope.openAspect();
 		Signature signature = jp.getSignature();
 		String name = signature.getName();
-		GitWrite annotation = getAnnotation(signature);
+		GitWriteDynamic dynamic = getDynamic(getAnnotation(signature), jp);
 		long time = System.currentTimeMillis();
-		init(jp, annotation);
-		startWatcher(annotation);
+		init(jp, dynamic);
+		startWatcher(dynamic);
 		if (log.isInfoEnabled()) {
-			log.info("** WRITE({}).init: {} ms, {} **", name, System.currentTimeMillis() - time, annotation);
+			log.info("** WRITE({}).init: {} ms, {} **", name, System.currentTimeMillis() - time, dynamic);
 		}
 		try {
 			time = System.currentTimeMillis();
-			Object result = success(jp, annotation, jp.proceed());
+			Object result = success(jp, dynamic, jp.proceed());
 			if (log.isInfoEnabled()) {
 				log.info("** WRITE({}).success: {} ms **", name, System.currentTimeMillis() - time);
 			}
 			return result;
 		} catch (Throwable e) {
-			Throwable error = error(jp, annotation, e);
-			if (log.isInfoEnabled()) {
-				log.info("** WRITE({}).failure: {} ms **", name, System.currentTimeMillis() - time);
+			Throwable error = error(jp, dynamic, e);
+			if (log.isErrorEnabled()) {
+				log.error("** WRITE({}).failure: {} ms **", name, System.currentTimeMillis() - time);
 			}
 			throw error;
 		} finally {
 			try {
 				time = System.currentTimeMillis();
 				IGitProvider provider = context.getBean(IGitProvider.class);
-				if (!annotation.value().isEmpty()) {
-					provider.cleanWrite(annotation.value());
+				if (!dynamic.value().isEmpty()) {
+					provider.cleanWrite(dynamic.value());
 				}
-				for (GitWriteDir d : annotation.values()) {
+				for (GitWriteDirDynamic d : dynamic.values()) {
 					provider.cleanWrite(d.value());
 				}
 				if (log.isInfoEnabled()) {
@@ -82,14 +87,29 @@ public class GitWriteAspect {
 		return null;
 	}
 
-	private void startWatcher(GitWrite annotation) {
+	@SneakyThrows
+	private GitWriteDynamic getDynamic(GitWrite annotation, ProceedingJoinPoint jp) {
+		String value = annotation.value();
+		Class<? extends IGitRouter> router = annotation.router();
+		if (router != IGitRouter.class) {
+			value = value + IGitRouter.SEPARATOR
+					+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
+		}
+		List<GitWriteDirDynamic> list = Stream.of(annotation.values())
+				.map((v) -> GitWriteDirDynamic.builder().value(v.value()).watcher(v.watcher()).build())
+				.collect(Collectors.toList());
+		GitWriteDirDynamic[] values = list.toArray(new GitWriteDirDynamic[0]);
+		return GitWriteDynamic.builder().value(value).values(values).build();
+	}
+
+	private void startWatcher(GitWriteDynamic annotation) {
 		IGitProvider provider = context.getBean(IGitProvider.class);
 		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
 			Path path = provider.directoryWrite(group).toPath();
 			publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.START, group, path));
 		}
-		for (GitWriteDir d : annotation.values()) {
+		for (GitWriteDirDynamic d : annotation.values()) {
 			if (d.watcher()) {
 				String g = d.value();
 				Path p = provider.directoryWrite(g).toPath();
@@ -98,32 +118,32 @@ public class GitWriteAspect {
 		}
 	}
 
-	private void init(ProceedingJoinPoint jp, GitWrite annotation) {
+	private void init(ProceedingJoinPoint jp, GitWriteDynamic annotation) {
 		publisher.publishEvent(new GitWriteEvent(jp, annotation, EGitWrite.INIT));
 	}
 
-	private Object success(ProceedingJoinPoint jp, GitWrite annotation, Object result) {
+	private Object success(ProceedingJoinPoint jp, GitWriteDynamic annotation, Object result) {
 		stopWatcher(annotation);
 		GitWriteEvent event = new GitWriteEvent(jp, annotation, EGitWrite.SUCCESS, result);
 		publisher.publishEvent(event);
 		return event.getResult();
 	}
 
-	private Throwable error(ProceedingJoinPoint jp, GitWrite annotation, Throwable e) {
+	private Throwable error(ProceedingJoinPoint jp, GitWriteDynamic annotation, Throwable e) {
 		stopWatcher(annotation);
 		GitWriteEvent event = new GitWriteEvent(jp, annotation, EGitWrite.FAILURE, e);
 		publisher.publishEvent(event);
 		return event.getError();
 	}
 
-	private void stopWatcher(GitWrite annotation) {
+	private void stopWatcher(GitWriteDynamic annotation) {
 		IGitProvider provider = context.getBean(IGitProvider.class);
 		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
 			Path path = provider.directoryWrite(group).toPath();
 			publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.STOP, group, path));
 		}
-		for (GitWriteDir d : annotation.values()) {
+		for (GitWriteDirDynamic d : annotation.values()) {
 			if (d.watcher()) {
 				String g = d.value();
 				Path p = provider.directoryWrite(g).toPath();

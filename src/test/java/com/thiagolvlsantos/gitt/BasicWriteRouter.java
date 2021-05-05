@@ -15,18 +15,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class BasicWrite {
+public class BasicWriteRouter {
 
 	private @Autowired GitServices services;
 
-	@GitWrite("projects")
-	public void write() throws Exception {
-		File dirProjects = services.writeDirectory("projects");
-		File newFile = new File(dirProjects, "projectA.txt");
+	@GitWrite(value = "projects", router = RouterName.class)
+	public void write(String name) throws Exception {
+		File dirProjects = services.writeDirectory("projects", RouterName.class, name);
+		File newFile = new File(dirProjects, name + ".txt");
 		if (newFile.exists() && log.isInfoEnabled()) {
 			log.info("BEFORE:" + Files.readString(newFile.toPath()));
 		}
-		String newContent = "{\"name\": \"projectA\", date: \"" + LocalDateTime.now() + "\"}";
+		String newContent = "{\"name\": \"" + name + "\", date: \"" + LocalDateTime.now() + "\"}";
 		newFile.getParentFile().mkdirs();
 		Files.write(newFile.toPath(), newContent.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 				StandardOpenOption.TRUNCATE_EXISTING);

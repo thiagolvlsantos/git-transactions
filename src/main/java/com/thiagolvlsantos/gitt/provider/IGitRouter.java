@@ -14,13 +14,13 @@ public interface IGitRouter {
 	String SEPARATOR = "_";
 
 	/**
-	 * Returns the group according to arguments.
+	 * Returns the route id according to method arguments.
 	 * 
 	 * @param group The original group.
 	 * @param args  The method arguments captured by Aspects.
 	 * @return The group reference.
 	 */
-	default String qualifier(String group, Object[] args) {
+	default String route(String group, Object[] args) {
 		return "";
 	}
 }

@@ -53,8 +53,8 @@ public class GitReadAspect {
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, dynamic, e);
-			if (log.isInfoEnabled()) {
-				log.info("** READ({}).failure: {} ms **", name, System.currentTimeMillis() - time);
+			if (log.isErrorEnabled()) {
+				log.error("** READ({}).failure: {} ms **", name, System.currentTimeMillis() - time);
 			}
 			throw error;
 		} finally {
@@ -89,7 +89,7 @@ public class GitReadAspect {
 		Class<? extends IGitRouter> router = annotation.router();
 		if (router != IGitRouter.class) {
 			value = value + IGitRouter.SEPARATOR
-					+ router.getDeclaredConstructor().newInstance().qualifier(value, jp.getArgs());
+					+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
 		}
 		List<GitReadDirDynamic> list = Stream.of(annotation.values())
 				.map((v) -> GitReadDirDynamic.builder().value(v.value()).build()).collect(Collectors.toList());

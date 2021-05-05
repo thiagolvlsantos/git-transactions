@@ -28,7 +28,7 @@ public class GitServices {
 			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		String value = group;
 		if (router != IGitRouter.class) {
-			value = value + IGitRouter.SEPARATOR + router.getDeclaredConstructor().newInstance().qualifier(group, args);
+			value = value + IGitRouter.SEPARATOR + router.getDeclaredConstructor().newInstance().route(group, args);
 		}
 		return value;
 	}

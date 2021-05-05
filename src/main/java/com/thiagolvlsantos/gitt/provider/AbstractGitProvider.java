@@ -264,7 +264,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			log.info("Could not delete: {}", dir);
 		}
 		if (log.isDebugEnabled()) {
-			log.debug("cleanWrite(success:{},{}):{} NOP time={}", delete, key, dir, System.currentTimeMillis() - time);
+			log.debug("cleanWrite(success:{},{}):{} time={}", delete, key, dir, System.currentTimeMillis() - time);
 		}
 	}
 

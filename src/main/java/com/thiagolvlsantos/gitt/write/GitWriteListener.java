@@ -20,14 +20,14 @@ public class GitWriteListener implements ApplicationListener<GitWriteEvent> {
 	public void onApplicationEvent(GitWriteEvent event) {
 		try {
 			IGitProvider provider = context.getBean(IGitProvider.class);
-			GitWrite annotation = event.getAnnotation();
+			GitWriteDynamic annotation = event.getAnnotation();
 			List<String> gs = new LinkedList<>();
 			String group = annotation.value();
 			if (!group.isEmpty()) {
 				gs.add(group);
 			}
-			GitWriteDir[] values = annotation.values();
-			for (GitWriteDir v : values) {
+			GitWriteDirDynamic[] values = annotation.values();
+			for (GitWriteDirDynamic v : values) {
 				gs.add(v.value());
 			}
 			for (String g : gs) {
