@@ -10,12 +10,12 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.thiagolvlsantos</groupId>
-	<artifactId>gitt</artifactId>
+	<artifactId>git-transaction</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gitt</name>
+	<name>git-transaction</name>
 	<description>Git transactions in Spring</description>
 	<properties>
-		<java.version>14</java.version>
+		<java.version>11</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
