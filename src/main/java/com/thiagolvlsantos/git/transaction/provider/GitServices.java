@@ -24,15 +24,6 @@ public class GitServices {
 	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
 
-	public String renamedGroup(String group, Class<? extends IGitRouter> router, Object... args)
-			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		String value = group;
-		if (router != IGitRouter.class) {
-			value = value + IGitRouter.SEPARATOR + router.getDeclaredConstructor().newInstance().route(group, args);
-		}
-		return value;
-	}
-
 	public File readDirectory(String group) {
 		return context.getBean(IGitProvider.class).directoryRead(group);
 	}
@@ -49,6 +40,15 @@ public class GitServices {
 	@SneakyThrows
 	public File writeDirectory(String group, Class<? extends IGitRouter> router, Object... args) {
 		return writeDirectory(renamedGroup(group, router, args));
+	}
+
+	public String renamedGroup(String group, Class<? extends IGitRouter> router, Object... args)
+			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		String value = group;
+		if (router != IGitRouter.class) {
+			value = value + IGitRouter.SEPARATOR + router.getDeclaredConstructor().newInstance().route(group, args);
+		}
+		return value;
 	}
 
 	public void created(Object source, String group, File... files) {
