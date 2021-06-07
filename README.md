@@ -9,8 +9,8 @@
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 
+Transactions using Git as repository.
 
-Classes shared for more than one `io.github.thiagolvlsantos.git` project.
 
 ## Usage
 
