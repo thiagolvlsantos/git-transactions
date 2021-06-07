@@ -88,16 +88,21 @@ public class GitWriteAspect {
 
 	@SneakyThrows
 	private GitWriteDynamic getDynamic(GitWrite annotation, ProceedingJoinPoint jp) {
-		String value = annotation.value();
-		Class<? extends IGitRouter> router = annotation.router();
-		if (router != IGitRouter.class) {
-			value = value + IGitRouter.SEPARATOR
-					+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
+		String value = null;
+		List<GitWriteDirDynamic> list = null;
+		if (annotation != null) {
+			value = annotation.value();
+			Class<? extends IGitRouter> router = annotation.router();
+			if (router != IGitRouter.class) {
+				value = value + IGitRouter.SEPARATOR
+						+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
+			}
+			list = Stream.of(annotation.values())
+					.map((v) -> GitWriteDirDynamic.builder().value(v.value()).watcher(v.watcher()).build())
+					.collect(Collectors.toList());
 		}
-		List<GitWriteDirDynamic> list = Stream.of(annotation.values())
-				.map((v) -> GitWriteDirDynamic.builder().value(v.value()).watcher(v.watcher()).build())
-				.collect(Collectors.toList());
-		GitWriteDirDynamic[] values = list.toArray(new GitWriteDirDynamic[0]);
+		GitWriteDirDynamic[] values = list != null ? list.toArray(new GitWriteDirDynamic[0])
+				: new GitWriteDirDynamic[0];
 		return GitWriteDynamic.builder().value(value).values(values).build();
 	}
 
