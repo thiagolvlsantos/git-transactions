@@ -45,6 +45,11 @@
 		<sonar.organization>${sonar.user}-projects</sonar.organization>
 		<sonar.projectKey>${sonar.user}_${project.artifactId}</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		
+		<!-- PROJECT SPECIFIC -->
+		<jgit.version>5.11.0.202103091610-r</jgit.version>
+		<commons-io.version>2.8.0</commons-io.version>
+		<git-commons.version>1.0.29</git-commons.version>
 	</properties>
 
 	<scm>
@@ -105,26 +110,18 @@
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
-			<version>5.11.0.202103091610-r</version>
+			<version>${jgit.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.8.0</version>
-		</dependency>
-	
-		<!--dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<optional>true</optional>
+			<version>${commons-io.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency-->
+			<groupId>io.github.thiagolvlsantos</groupId>
+			<artifactId>git-commons</artifactId>
+			<version>${git-commons.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -148,7 +145,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
 				<configuration>
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
@@ -165,7 +161,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.0.2</version>
 				<configuration>
 					<downloadSources>true</downloadSources>
 					<downloadJavadocs>true</downloadJavadocs>
@@ -176,7 +171,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -218,7 +212,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -237,21 +230,7 @@
 					<updateReleaseInfo>true</updateReleaseInfo>
 				</configuration>
 			</plugin>
-			
-			<!--plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin-->
 		</plugins>
-
 	</build>
 
 	<profiles>

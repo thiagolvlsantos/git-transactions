@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.FileSystemUtils;
 
+import io.github.thiagolvlsantos.git.commons.file.FileUtils;
 import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
-import io.github.thiagolvlsantos.git.transactions.file.FileUtils;
 import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -249,6 +249,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	@Override
 	public void cleanWrite(String group) throws GitAPIException {
 		long time = System.currentTimeMillis();
@@ -258,12 +259,17 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		if (git != null) {
 			git.close();
 		}
-		boolean delete = FileUtils.delete(dir);
-		if (!delete && log.isInfoEnabled()) {
-			log.info("Could not delete: {}", dir);
-		}
-		if (log.isDebugEnabled()) {
-			log.debug("cleanWrite(success:{},{}):{} time={}", delete, key, dir, System.currentTimeMillis() - time);
+		try {
+			boolean delete = FileUtils.delete(dir);
+			if (!delete && log.isInfoEnabled()) {
+				log.info("Could not delete: {}", dir);
+			}
+			if (log.isDebugEnabled()) {
+				log.debug("cleanWrite(success:{},{}):{} time={}", delete, key, dir, System.currentTimeMillis() - time);
+			}
+		} catch (IOException e) {
+			throw new GitAPIException(e.getMessage(), e) {
+			};
 		}
 	}
 
