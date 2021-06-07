@@ -84,15 +84,19 @@ public class GitReadAspect {
 
 	@SneakyThrows
 	private GitReadDynamic getDynamic(GitRead annotation, ProceedingJoinPoint jp) {
-		String value = annotation.value();
-		Class<? extends IGitRouter> router = annotation.router();
-		if (router != IGitRouter.class) {
-			value = value + IGitRouter.SEPARATOR
-					+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
+		String value = null;
+		List<GitReadDirDynamic> list = null;
+		if (annotation != null) {
+			value = annotation.value();
+			Class<? extends IGitRouter> router = annotation.router();
+			if (router != IGitRouter.class) {
+				value = value + IGitRouter.SEPARATOR
+						+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
+			}
+			list = Stream.of(annotation.values()).map((v) -> GitReadDirDynamic.builder().value(v.value()).build())
+					.collect(Collectors.toList());
 		}
-		List<GitReadDirDynamic> list = Stream.of(annotation.values())
-				.map((v) -> GitReadDirDynamic.builder().value(v.value()).build()).collect(Collectors.toList());
-		GitReadDirDynamic[] values = list.toArray(new GitReadDirDynamic[0]);
+		GitReadDirDynamic[] values = list != null ? list.toArray(new GitReadDirDynamic[0]) : new GitReadDirDynamic[0];
 		return GitReadDynamic.builder().value(value).values(values).build();
 	}
 
