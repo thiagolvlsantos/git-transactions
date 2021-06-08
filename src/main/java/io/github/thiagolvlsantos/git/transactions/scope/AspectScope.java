@@ -60,9 +60,13 @@ public class AspectScope implements Scope {
 		if (callback != null) {
 			try {
 				callback.run();
-			} catch (Throwable e) {
+			} catch (RuntimeException e) {
 				if (log.isDebugEnabled()) {
-					log.debug("Error on remove: " + e.getMessage(), e);
+					log.debug("Runtime error on remove: " + e.getMessage(), e);
+				}
+			} catch (Exception e) {
+				if (log.isDebugEnabled()) {
+					log.debug("Typed error on remove: " + e.getMessage(), e);
 				}
 			}
 		}
