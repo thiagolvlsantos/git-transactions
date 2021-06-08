@@ -10,7 +10,7 @@ public class GitReadEvent extends ApplicationEvent {
 
 	private GitReadDynamic annotation;
 	private EGitRead type;
-	private Object result;
+	private transient Object result;
 	private Throwable error;
 
 	public GitReadEvent(Object source, GitReadDynamic annotation, EGitRead type) {

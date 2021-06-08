@@ -12,7 +12,7 @@ public class FileWatcherEvent extends ApplicationEvent {
 
 	private EWatcherAction type;
 	private String group;
-	private Path dir;
+	private transient Path dir;
 
 	public FileWatcherEvent(Object source, EWatcherAction type, String group, Path dir) {
 		super(source);
