@@ -1,7 +1,6 @@
 package io.github.thiagolvlsantos.git.transactions.watcher;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,12 +95,8 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 
 		public Watcher(String group, Path dir) {
 			this.group = group;
-			this.observer = new FileAlterationObserver(dir.toFile(), new FileFilter() {
-				@Override
-				public boolean accept(File pathname) {
-					return !pathname.getAbsolutePath().contains(".git");
-				}
-			});
+			this.observer = new FileAlterationObserver(dir.toFile(),
+					(pathname) -> !pathname.getAbsolutePath().contains(".git"));
 			this.observer.checkAndNotify(); // initial setup
 			this.listener = new FileAlterationListenerAdaptor() {
 				@Override
