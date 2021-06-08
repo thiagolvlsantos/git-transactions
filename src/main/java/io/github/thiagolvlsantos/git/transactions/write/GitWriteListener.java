@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitProvider;
 
 @Component
@@ -44,7 +45,7 @@ public class GitWriteListener implements ApplicationListener<GitWriteEvent> {
 				}
 			}
 		} catch (GitAPIException e) {
-			throw new RuntimeException(e);
+			throw new GitTransactionsException(e);
 		}
 	}
 }

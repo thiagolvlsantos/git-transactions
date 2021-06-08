@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import lombok.Data;
 
 @Configuration
@@ -28,7 +29,7 @@ public class GittConfig {
 		for (int i = 0; i < ps.length - 1; i++) {
 			map = (Map<String, Object>) map.get(ps[i]);
 			if (map == null) {
-				throw new RuntimeException("Missing property>" + path);
+				throw new GitTransactionsException("Missing property>" + path);
 			}
 		}
 		String result = (String) map.get(ps[ps.length - 1]);

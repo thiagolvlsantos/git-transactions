@@ -20,6 +20,7 @@ import org.springframework.util.FileSystemUtils;
 
 import io.github.thiagolvlsantos.git.commons.file.FileUtils;
 import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
+import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,7 +105,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				if (log.isDebugEnabled()) {
 					log.debug(e.getMessage(), e);
 				}
-				throw new RuntimeException(e);
+				throw new GitTransactionsException(e);
 			}
 		});
 		if (!silent && log.isDebugEnabled()) {
@@ -127,7 +128,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				if (log.isDebugEnabled()) {
 					log.debug(e.getMessage(), e);
 				}
-				throw new RuntimeException(e);
+				throw new GitTransactionsException(e);
 			}
 		});
 		if (log.isDebugEnabled()) {
@@ -183,7 +184,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
 			}
-			throw new RuntimeException(e);
+			throw new GitTransactionsException(e);
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("copy({}) time={}", group, System.currentTimeMillis() - time);

@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitProvider;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +50,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
 			}
-			throw new RuntimeException(e);
+			throw new GitTransactionsException(e);
 		}
 	}
 
