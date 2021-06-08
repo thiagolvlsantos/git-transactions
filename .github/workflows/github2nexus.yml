@@ -23,6 +23,7 @@ jobs:
       - name: Publish package
         run: mvn -Psign,github2Nexus --batch-mode clean deploy 
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}           
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
