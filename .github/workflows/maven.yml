@@ -21,10 +21,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Configure Git User
-      run: |
-        git config http.postBuffer 524288000
     - name: Build with Maven
-      run: mvn -U -B package --file pom.xml
+      run: mvn -U -B package --file pom.xml -Dhttp.postBuffer=524288000
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
