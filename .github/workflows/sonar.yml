@@ -33,5 +33,6 @@ jobs:
     - name: Build with Maven and Analyze
       run: mvn -U -B --file pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  # Needed to get PR information, if any
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }} # for tests
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
