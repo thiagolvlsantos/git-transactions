@@ -1,5 +1,7 @@
 package io.github.thiagolvlsantos.git.transactions.write;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GitWriteDynamic {
+@SuppressWarnings("serial")
+public class GitWriteDynamic implements Serializable {
 
 	@Builder.Default
 	private String value = "";

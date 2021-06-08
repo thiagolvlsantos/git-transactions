@@ -4,8 +4,8 @@ import org.springframework.context.ApplicationEvent;
 
 import lombok.Getter;
 
-@SuppressWarnings("serial")
 @Getter
+@SuppressWarnings("serial")
 public class GitReadEvent extends ApplicationEvent {
 
 	private GitReadDynamic annotation;
