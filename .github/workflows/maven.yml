@@ -21,10 +21,9 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Setup Git
-      run: |
-        git config --global http.postBuffer 100000000
     - name: Build with Maven
-      run: mvn -U -B package --file pom.xml
+      run: |
+        export GIT_HTTP_MAX_REQUEST_BUFFER=100M
+        mvn -U -B package --file pom.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
