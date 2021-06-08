@@ -16,10 +16,10 @@ import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
 @SpringBootTest
 @ComponentScan("io.github.thiagolvlsantos")
 @Import(BasicRead.class)
-public class BasicReadApplicationTest {
+class BasicReadApplicationTest {
 
 	@Test
-	public void read(@Autowired ApplicationContext ctx) throws Exception {
+	void read(@Autowired ApplicationContext ctx) throws Exception {
 		BasicRead s = ctx.getBean(BasicRead.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		assertTrue(s.read());
