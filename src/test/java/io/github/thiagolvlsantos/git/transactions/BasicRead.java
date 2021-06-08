@@ -18,13 +18,15 @@ public class BasicRead {
 	private @Autowired GitServices services;
 
 	@GitRead("projects")
-	public void read() throws IOException {
+	public boolean read() throws IOException {
 		File dir = services.readDirectory("projects");
 		for (File f : dir.listFiles()) {
 			System.out.println(f.getName());
 		}
+		String content = Files.readString(new File(dir, "projectA.txt").toPath());
 		if (log.isInfoEnabled()) {
-			log.info("CONTENT(projectA.txt):" + Files.readString(new File(dir, "projectA.txt").toPath()));
+			log.info("CONTENT(projectA.txt):" + content);
 		}
+		return content.contains("\"name\": \"projectA\"");
 	}
 }
