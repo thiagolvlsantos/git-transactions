@@ -39,6 +39,10 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		case STOP:
 			stop(group, dir);
 			break;
+		default:
+			if (log.isInfoEnabled()) {
+				log.info("File watcher received: {}", event);
+			}
 		}
 	}
 
