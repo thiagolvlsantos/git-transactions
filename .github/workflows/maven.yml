@@ -24,6 +24,7 @@ jobs:
     - name: Build with Maven
       run: |
         git config --global http.postBuffer 157286400
+        git clone https://github.com/thiagolvlsantos/gitt-example-projects.git
         mvn -U -B package --file pom.xml
       env:
-        GIT_TOKEN: "lixo"
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
