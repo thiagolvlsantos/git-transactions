@@ -97,7 +97,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 
 	public Git gitReadSilent(String group, boolean silent) throws GitAPIException {
 		String key = keyRead(group);
-		Git instance = this.gitsRead.computeIfAbsent(key, (k) -> {
+		Git instance = this.gitsRead.computeIfAbsent(key, k -> {
 			try {
 				return instance(group, directoryRead(group), silent);
 			} catch (Exception e) {
@@ -120,7 +120,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	@Override
 	public Git gitWrite(String group) throws GitAPIException {
 		String key = keyWrite(group);
-		Git instance = this.gitsWrite.computeIfAbsent(key, (k) -> {
+		Git instance = this.gitsWrite.computeIfAbsent(key, k -> {
 			try {
 				return instance(group, directoryWrite(group), false);
 			} catch (Exception e) {
