@@ -93,7 +93,7 @@ public class GitReadAspect {
 				value = value + IGitRouter.SEPARATOR
 						+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
 			}
-			list = Stream.of(annotation.values()).map((v) -> GitReadDirDynamic.builder().value(v.value()).build())
+			list = Stream.of(annotation.values()).map(v -> GitReadDirDynamic.builder().value(v.value()).build())
 					.collect(Collectors.toList());
 		}
 		GitReadDirDynamic[] values = list != null ? list.toArray(new GitReadDirDynamic[0]) : new GitReadDirDynamic[0];

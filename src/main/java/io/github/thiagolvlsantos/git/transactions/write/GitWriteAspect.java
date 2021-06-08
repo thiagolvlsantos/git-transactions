@@ -98,7 +98,7 @@ public class GitWriteAspect {
 						+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
 			}
 			list = Stream.of(annotation.values())
-					.map((v) -> GitWriteDirDynamic.builder().value(v.value()).watcher(v.watcher()).build())
+					.map(v -> GitWriteDirDynamic.builder().value(v.value()).watcher(v.watcher()).build())
 					.collect(Collectors.toList());
 		}
 		GitWriteDirDynamic[] values = list != null ? list.toArray(new GitWriteDirDynamic[0])
