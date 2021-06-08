@@ -96,7 +96,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		public Watcher(String group, Path dir) {
 			this.group = group;
 			this.observer = new FileAlterationObserver(dir.toFile(),
-					(pathname) -> !pathname.getAbsolutePath().contains(".git"));
+					pathname -> !pathname.getAbsolutePath().contains(".git"));
 			this.observer.checkAndNotify(); // initial setup
 			this.listener = new FileAlterationListenerAdaptor() {
 				@Override
