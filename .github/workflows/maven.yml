@@ -25,6 +25,7 @@ jobs:
       run: |
         git config --global http.postBuffer 157286400
         git clone https://github.com/thiagolvlsantos/gitt-example-projects.git
+        ls -la gitt-example-projects
         mvn -U -B package --file pom.xml
       env:
         GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
