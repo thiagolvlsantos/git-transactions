@@ -4,7 +4,6 @@ import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +53,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 		}
 	}
 
-	private void create(String group, Git git, StringBuilder msg, String pattern)
-			throws GitAPIException, NoFilepatternException {
+	private void create(String group, Git git, StringBuilder msg, String pattern) throws GitAPIException {
 		AddCommand add = git.add().addFilepattern(pattern);
 		msg.append("Added: " + pattern + "\n");
 		DirCache addResult = add.call();
@@ -64,8 +62,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 		}
 	}
 
-	private void modify(String group, Git git, StringBuilder msg, String pattern)
-			throws GitAPIException, NoFilepatternException {
+	private void modify(String group, Git git, StringBuilder msg, String pattern) throws GitAPIException {
 		AddCommand update = git.add().addFilepattern(pattern);
 		msg.append("Updated: " + pattern + "\n");
 		DirCache addResultUpdate = update.call();
@@ -74,8 +71,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 		}
 	}
 
-	private void delete(String group, Git git, StringBuilder msg, String pattern)
-			throws GitAPIException, NoFilepatternException {
+	private void delete(String group, Git git, StringBuilder msg, String pattern) throws GitAPIException {
 		RmCommand delete = git.rm().addFilepattern(pattern);
 		msg.append("Deleted: " + pattern + "\n");
 		DirCache deleteResult = delete.call();
