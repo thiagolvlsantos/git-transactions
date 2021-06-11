@@ -18,14 +18,16 @@ public class BasicReadRouter {
 	private @Autowired GitServices services;
 
 	@GitRead(value = "projects", router = RouterName.class)
-	public void read(String name) throws IOException {
+	public String read(String name) throws IOException {
 		File dir = services.readDirectory("projects", RouterName.class, name);
 		for (File f : dir.listFiles()) {
 			System.out.println(f.getName());
 		}
+		String content = Files.readString(new File(dir, "README.md").toPath());
 		if (log.isInfoEnabled()) {
 			log.info("DIR:" + dir.getAbsolutePath());
-			log.info("CONTENT(README.md):" + Files.readString(new File(dir, "README.md").toPath()));
+			log.info("CONTENT(README.md):" + content);
 		}
+		return content;
 	}
 }
