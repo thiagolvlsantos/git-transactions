@@ -1,7 +1,5 @@
 package io.github.thiagolvlsantos.git.transactions;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,16 +13,14 @@ import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
 @ContextConfiguration(classes = GittConfig.class)
 @SpringBootTest
 @ComponentScan("io.github.thiagolvlsantos")
-@Import(BasicWriteRouter.class)
-class BasicWriteRouterApplicationTest {
+@Import(ServiceReadWrite.class)
+class GittReadWriteApplicationTest {
 
 	@Test
-	void testWriteRouter(@Autowired ApplicationContext ctx) throws Exception {
-		BasicWriteRouter s = ctx.getBean(BasicWriteRouter.class);
+	void testReadWrite(@Autowired ApplicationContext ctx) throws Exception {
+		ServiceReadWrite s = ctx.getBean(ServiceReadWrite.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.write("proj1")).contains("proj1");
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.write("proj2")).contains("proj2");
+		s.mix();
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }
