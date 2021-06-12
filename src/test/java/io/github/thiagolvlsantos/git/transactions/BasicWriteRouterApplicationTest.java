@@ -15,14 +15,16 @@ import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
 @ContextConfiguration(classes = GittConfig.class)
 @SpringBootTest
 @ComponentScan("io.github.thiagolvlsantos")
-@Import(BasicWrite.class)
-class BasicWriteApplicationTest {
+@Import(BasicWriteRouter.class)
+public class BasicWriteRouterApplicationTest {
 
 	@Test
-	void testWrite(@Autowired ApplicationContext ctx) throws Exception {
-		BasicWrite s = ctx.getBean(BasicWrite.class);
+	void testWriteRouter(@Autowired ApplicationContext ctx) throws Exception {
+		BasicWriteRouter s = ctx.getBean(BasicWriteRouter.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.write()).contains("projectA");
+		assertThat(s.write("proj1")).contains("proj1");
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+		assertThat(s.write("proj2")).contains("proj2");
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

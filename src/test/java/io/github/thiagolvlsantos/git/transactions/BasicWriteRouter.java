@@ -19,7 +19,7 @@ public class BasicWriteRouter {
 	private @Autowired GitServices services;
 
 	@GitWrite(value = "projects", router = RouterName.class)
-	public void write(String name) throws Exception {
+	public String write(String name) throws Exception {
 		File dirProjects = services.writeDirectory("projects", RouterName.class, name);
 		File newFile = new File(dirProjects, name + ".txt");
 		if (newFile.exists() && log.isInfoEnabled()) {
@@ -29,8 +29,10 @@ public class BasicWriteRouter {
 		newFile.getParentFile().mkdirs();
 		Files.write(newFile.toPath(), newContent.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 				StandardOpenOption.TRUNCATE_EXISTING);
+		String content = Files.readString(newFile.toPath());
 		if (log.isInfoEnabled()) {
-			log.info(" AFTER:" + Files.readString(newFile.toPath()));
+			log.info(" AFTER:" + content);
 		}
+		return content;
 	}
 }
