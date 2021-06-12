@@ -1,23 +1,14 @@
 package io.github.thiagolvlsantos.git.transactions.watcher;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.monitor.FileAlterationListener;
-import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
-import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import io.github.thiagolvlsantos.git.transactions.file.EFileStatus;
-import io.github.thiagolvlsantos.git.transactions.file.FileEvent;
-import io.github.thiagolvlsantos.git.transactions.file.FileItem;
-import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -61,7 +52,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			};
 			Runtime.getRuntime().addShutdownHook(shutdownHook);
 		}
-		Watcher tmp = new Watcher(group, dir);
+		Watcher tmp = new Watcher(group, dir, publisher);
 		String key = key(group, dir);
 		watchers.compute(key, (k, v) -> {
 			if (v != null) {
@@ -89,42 +80,5 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			log.debug("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		}
 		return tmp;
-	}
-
-	@Getter
-	public class Watcher {
-		private String group;
-		private FileAlterationObserver observer;
-		private FileAlterationListener listener;
-
-		public Watcher(String group, Path dir) {
-			this.group = group;
-			this.observer = new FileAlterationObserver(dir.toFile(),
-					pathname -> !pathname.getAbsolutePath().contains(".git"));
-			this.observer.checkAndNotify(); // initial setup
-			this.listener = new FileAlterationListenerAdaptor() {
-				@Override
-				public void onFileCreate(File file) {
-					publisher.publishEvent(new FileEvent(this, group, new FileItem(file, EFileStatus.CREATE)));
-				}
-
-				@Override
-				public void onFileDelete(File file) {
-					publisher.publishEvent(new FileEvent(this, group, new FileItem(file, EFileStatus.DELETE)));
-				}
-
-				@Override
-				public void onFileChange(File file) {
-					publisher.publishEvent(new FileEvent(this, group, new FileItem(file, EFileStatus.MODIFY)));
-				}
-			};
-			observer.addListener(listener);
-		}
-
-		@SneakyThrows
-		public void finish() {
-			observer.checkAndNotify();
-			observer.destroy();
-		}
 	}
 }

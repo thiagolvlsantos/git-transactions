@@ -20,7 +20,7 @@ public class AspectScope implements Scope {
 		scope.add(new HashMap<>());
 		destruction.add(new HashMap<>());
 		if (log.isDebugEnabled()) {
-			log.info("Scope openned.");
+			log.debug("Scope openned.");
 		}
 	}
 
