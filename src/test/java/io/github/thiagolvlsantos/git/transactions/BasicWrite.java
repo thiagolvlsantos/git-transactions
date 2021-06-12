@@ -19,18 +19,21 @@ public class BasicWrite {
 	private @Autowired GitServices services;
 
 	@GitWrite("projects")
-	public void write() throws Exception {
+	public String write() throws Exception {
+		String projectName = "projectA";
 		File dirProjects = services.writeDirectory("projects");
-		File newFile = new File(dirProjects, "projectA.txt");
+		File newFile = new File(dirProjects, projectName + ".txt");
 		if (newFile.exists() && log.isInfoEnabled()) {
 			log.info("BEFORE:" + Files.readString(newFile.toPath()));
 		}
-		String newContent = "{\"name\": \"projectA\", date: \"" + LocalDateTime.now() + "\"}";
+		String newContent = "{\"name\": \"" + projectName + "\", date: \"" + LocalDateTime.now() + "\"}";
 		newFile.getParentFile().mkdirs();
 		Files.write(newFile.toPath(), newContent.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 				StandardOpenOption.TRUNCATE_EXISTING);
+		String content = Files.readString(newFile.toPath());
 		if (log.isInfoEnabled()) {
-			log.info(" AFTER:" + Files.readString(newFile.toPath()));
+			log.info(" AFTER:" + content);
 		}
+		return content;
 	}
 }

@@ -15,16 +15,14 @@ import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
 @ContextConfiguration(classes = GittConfig.class)
 @SpringBootTest
 @ComponentScan("io.github.thiagolvlsantos")
-@Import(BasicReadRouter.class)
-class BasicReadRouterApplicationTest {
+@Import(BasicWrite.class)
+class BasicWriteApplicationTest {
 
 	@Test
 	void testReaderRouter(@Autowired ApplicationContext ctx) throws Exception {
-		BasicReadRouter s = ctx.getBean(BasicReadRouter.class);
+		BasicWrite s = ctx.getBean(BasicWrite.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.read("proj1")).contains("odd ids");
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.read("proj2")).contains("even ids");
+		assertThat(s.write()).contains("projectA");
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }
