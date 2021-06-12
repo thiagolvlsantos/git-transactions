@@ -1,21 +1,19 @@
-package io.github.thiagolvlsantos.git.transactions;
+package io.github.thiagolvlsantos.git.transactions.integration;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
-public class GittWriteApplication {
+public class BasicReadRouterApplication {
 
 	public static void main(String[] args) throws Exception {
-		ApplicationContext ctx = SpringApplication.run(GittWriteApplication.class, args);
-		ServiceWrite s = ctx.getBean(ServiceWrite.class);
+		ApplicationContext ctx = SpringApplication.run(BasicReadRouterApplication.class, args);
+		BasicReadRouter s = ctx.getBean(BasicReadRouter.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		s.write();
+		s.read("proj1");
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		s.writeMix();
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		s.writeDouble();
+		s.read("proj2");
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

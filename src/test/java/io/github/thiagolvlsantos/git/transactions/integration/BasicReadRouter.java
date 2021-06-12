@@ -1,4 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions;
+package io.github.thiagolvlsantos.git.transactions.integration;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,20 +13,21 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class BasicRead {
+public class BasicReadRouter {
 
 	private @Autowired GitServices services;
 
-	@GitRead("projects")
-	public boolean read() throws IOException {
-		File dir = services.readDirectory("projects");
+	@GitRead(value = "projects", router = RouterName.class)
+	public String read(String name) throws IOException {
+		File dir = services.readDirectory("projects", RouterName.class, name);
 		for (File f : dir.listFiles()) {
 			System.out.println(f.getName());
 		}
-		String content = Files.readString(new File(dir, "projectA.txt").toPath());
+		String content = Files.readString(new File(dir, "README.md").toPath());
 		if (log.isInfoEnabled()) {
-			log.info("CONTENT(projectA.txt):" + content);
+			log.info("DIR:" + dir.getAbsolutePath());
+			log.info("CONTENT(README.md):" + content);
 		}
-		return content.contains("\"name\": \"projectA\"");
+		return content;
 	}
 }

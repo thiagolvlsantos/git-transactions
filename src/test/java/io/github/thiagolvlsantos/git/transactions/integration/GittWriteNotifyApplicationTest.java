@@ -1,6 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package io.github.thiagolvlsantos.git.transactions.integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +13,14 @@ import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
 @ContextConfiguration(classes = GittConfig.class)
 @SpringBootTest
 @ComponentScan("io.github.thiagolvlsantos")
-@Import(BasicWrite.class)
-class BasicWriteApplicationTest {
+@Import(ServiceWriteNotify.class)
+class GittWriteNotifyApplicationTest {
 
 	@Test
-	void testWrite(@Autowired ApplicationContext ctx) throws Exception {
-		BasicWrite s = ctx.getBean(BasicWrite.class);
+	void testWriteNotify(@Autowired ApplicationContext ctx) throws Exception {
+		ServiceWriteNotify s = ctx.getBean(ServiceWriteNotify.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.write()).contains("projectA");
+		s.write();
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

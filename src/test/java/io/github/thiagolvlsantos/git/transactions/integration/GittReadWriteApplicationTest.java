@@ -1,6 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package io.github.thiagolvlsantos.git.transactions.integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +13,14 @@ import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
 @ContextConfiguration(classes = GittConfig.class)
 @SpringBootTest
 @ComponentScan("io.github.thiagolvlsantos")
-@Import(BasicReadRouter.class)
-class BasicReadRouterApplicationTest {
+@Import(ServiceReadWrite.class)
+class GittReadWriteApplicationTest {
 
 	@Test
-	void testReaderRouter(@Autowired ApplicationContext ctx) throws Exception {
-		BasicReadRouter s = ctx.getBean(BasicReadRouter.class);
+	void testReadWrite(@Autowired ApplicationContext ctx) throws Exception {
+		ServiceReadWrite s = ctx.getBean(ServiceReadWrite.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.read("proj1")).contains("odd ids");
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		assertThat(s.read("proj2")).contains("even ids");
+		s.mix();
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

@@ -1,4 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions;
+package io.github.thiagolvlsantos.git.transactions.integration;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -14,19 +14,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class BasicWrite {
+public class BasicWriteRouter {
 
 	private @Autowired GitServices services;
 
-	@GitWrite("projects")
-	public String write() throws Exception {
-		String projectName = "projectA";
-		File dirProjects = services.writeDirectory("projects");
-		File newFile = new File(dirProjects, projectName + ".txt");
+	@GitWrite(value = "projects", router = RouterName.class)
+	public String write(String name) throws Exception {
+		File dirProjects = services.writeDirectory("projects", RouterName.class, name);
+		File newFile = new File(dirProjects, name + ".txt");
 		if (newFile.exists() && log.isInfoEnabled()) {
 			log.info("BEFORE:" + Files.readString(newFile.toPath()));
 		}
-		String newContent = "{\"name\": \"" + projectName + "\", date: \"" + LocalDateTime.now() + "\"}";
+		String newContent = "{\"name\": \"" + name + "\", date: \"" + LocalDateTime.now() + "\"}";
 		newFile.getParentFile().mkdirs();
 		Files.write(newFile.toPath(), newContent.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 				StandardOpenOption.TRUNCATE_EXISTING);

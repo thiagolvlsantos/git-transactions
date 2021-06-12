@@ -1,4 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions;
+package io.github.thiagolvlsantos.git.transactions.integration;
 
 import java.io.File;
 import java.io.FileOutputStream;

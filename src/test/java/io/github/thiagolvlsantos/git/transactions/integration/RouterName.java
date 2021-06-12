@@ -1,4 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions;
+package io.github.thiagolvlsantos.git.transactions.integration;
 
 import io.github.thiagolvlsantos.git.transactions.provider.IGitRouter;
 
