@@ -47,7 +47,7 @@
 		<sonar.organization>${sonar.user}-projects</sonar.organization>
 		<sonar.projectKey>${sonar.user}_${project.artifactId}</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.coverage.exclusions>**/*Print.java</sonar.coverage.exclusions>
+		<sonar.coverage.exclusions>**/*Print.java,**/*Web.java</sonar.coverage.exclusions>
 
 		<!-- PROJECT SPECIFIC -->
 		<jgit.version>5.11.1.202105131744-r</jgit.version>
@@ -136,6 +136,16 @@
 			<groupId>io.github.thiagolvlsantos</groupId>
 			<artifactId>git-commons</artifactId>
 			<version>${git-commons.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
