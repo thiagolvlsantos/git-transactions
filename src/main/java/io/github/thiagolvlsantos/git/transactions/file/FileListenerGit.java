@@ -66,9 +66,9 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 	private void modify(String group, Git git, StringBuilder msg, String pattern) throws GitAPIException {
 		AddCommand update = git.add().addFilepattern(pattern);
 		msg.append("Updated: " + pattern + "\n");
-		DirCache addResultUpdate = update.call();
+		DirCache updateResult = update.call();
 		if (log.isDebugEnabled()) {
-			log.debug(group + ".UPDATED: " + addResultUpdate);
+			log.debug(group + ".UPDATED: " + updateResult);
 		}
 	}
 
