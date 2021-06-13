@@ -37,6 +37,9 @@ public class GitConfiguration {
 		if (result != null && qualifier != null) {
 			result = result.replace("$route$", qualifier);
 		}
+		if (result == null) {
+			throw new GitTransactionsException("Missing property>" + path);
+		}
 		return result;
 	}
 }
