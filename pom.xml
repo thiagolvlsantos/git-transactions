@@ -47,7 +47,7 @@
 		<sonar.organization>${sonar.user}-projects</sonar.organization>
 		<sonar.projectKey>${sonar.user}_${project.artifactId}</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.coverage.exclusions>**/*Print.java,**/*Web.java</sonar.coverage.exclusions>
+		<sonar.coverage.exclusions>**/*Print.java,**/*Web.java,**/*Constants.java,**/*Test.java</sonar.coverage.exclusions>
 
 		<!-- PROJECT SPECIFIC -->
 		<jgit.version>5.11.1.202105131744-r</jgit.version>
