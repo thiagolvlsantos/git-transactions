@@ -16,6 +16,8 @@ import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
 @SpringBootTest
 class ISessionIdHolderTest {
 
+	private static final String CURRENT = "fixed";
+
 	public static class Config {
 		@Bean
 		public ISessionIdHolder holder() {
@@ -23,7 +25,7 @@ class ISessionIdHolderTest {
 
 				@Override
 				public String current() {
-					return "fixed";
+					return CURRENT;
 				}
 			};
 		}
@@ -32,6 +34,6 @@ class ISessionIdHolderTest {
 	@Test
 	void defined(@Autowired ApplicationContext ctx) throws Exception {
 		ISessionIdHolder s = SessionIdHolderHelper.holder(ctx);
-		assertThat(s.current()).isEqualTo("fixed");
+		assertThat(s.current()).isEqualTo(CURRENT);
 	}
 }

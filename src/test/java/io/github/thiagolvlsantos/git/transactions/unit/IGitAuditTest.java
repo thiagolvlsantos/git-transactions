@@ -15,14 +15,22 @@ import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit;
 @ContextConfiguration(classes = IGitAuditTest.Config.class)
 @SpringBootTest
 class IGitAuditTest {
+	private static final String NAME = "Thiago";
+	private static final String EMAIL = "thiagolvlsantos@gmail.com";
 
 	public static class Config {
+
 		@Bean
 		public IGitAudit audit() {
 			return new IGitAudit() {
 				@Override
 				public String username() {
-					return "Thiago";
+					return NAME;
+				}
+
+				@Override
+				public String email() {
+					return EMAIL;
 				}
 			};
 		}
@@ -31,6 +39,7 @@ class IGitAuditTest {
 	@Test
 	void defined(@Autowired ApplicationContext ctx) throws Exception {
 		IGitAudit s = GitAuditHelper.audit(ctx);
-		assertThat(s.username()).isEqualTo("Thiago");
+		assertThat(s.username()).isEqualTo(NAME);
+		assertThat(s.email()).isEqualTo(EMAIL);
 	}
 }
