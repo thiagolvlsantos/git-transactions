@@ -18,6 +18,9 @@ public class GitConfiguration {
 
 	@SuppressWarnings("unchecked")
 	public String get(String path) {
+		if (path == null) {
+			return null;
+		}
 		String[] ps = path.split("\\.");
 		String group = ps[0];
 		int pos = group.lastIndexOf("_");
