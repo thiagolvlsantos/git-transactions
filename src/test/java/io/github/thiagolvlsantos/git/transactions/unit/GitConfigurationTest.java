@@ -51,7 +51,7 @@ class GitConfigurationTest {
 	@Test
 	void templateValues() {
 		assertThat(config.get("project_template.url")).isEqualTo("http://template");
-		assertThat(config.get("project_template.olther")).isNull();
+		assertThat(config.get("project_template.other")).isNull();
 	}
 
 	@ParameterizedTest
