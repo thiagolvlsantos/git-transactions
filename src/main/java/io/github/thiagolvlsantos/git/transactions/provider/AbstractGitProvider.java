@@ -105,7 +105,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				if (log.isDebugEnabled()) {
 					log.debug(e.getMessage(), e);
 				}
-				throw new GitTransactionsException(e);
+				throw new GitTransactionsException(e.getMessage(), e);
 			}
 		});
 		if (!silent && log.isDebugEnabled()) {
@@ -128,7 +128,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				if (log.isDebugEnabled()) {
 					log.debug(e.getMessage(), e);
 				}
-				throw new GitTransactionsException(e);
+				throw new GitTransactionsException(e.getMessage(), e);
 			}
 		});
 		if (log.isDebugEnabled()) {
@@ -184,7 +184,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
 			}
-			throw new GitTransactionsException(e);
+			throw new GitTransactionsException(e.getMessage(), e);
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("copy({}) time={}", group, System.currentTimeMillis() - time);

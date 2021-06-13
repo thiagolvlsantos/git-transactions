@@ -50,7 +50,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
 			}
-			throw new GitTransactionsException(e);
+			throw new GitTransactionsException(e.getMessage(), e);
 		}
 	}
 

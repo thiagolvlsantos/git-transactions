@@ -50,7 +50,7 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
 			}
-			throw new GitTransactionsException(e);
+			throw new GitTransactionsException(e.getMessage(), e);
 		}
 	}
 }

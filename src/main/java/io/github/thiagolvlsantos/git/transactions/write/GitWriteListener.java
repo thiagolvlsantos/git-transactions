@@ -45,7 +45,7 @@ public class GitWriteListener implements ApplicationListener<GitWriteEvent> {
 				}
 			}
 		} catch (GitAPIException e) {
-			throw new GitTransactionsException(e);
+			throw new GitTransactionsException(e.getMessage(), e);
 		}
 	}
 }

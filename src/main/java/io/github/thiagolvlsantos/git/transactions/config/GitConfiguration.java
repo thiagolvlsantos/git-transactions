@@ -33,7 +33,7 @@ public class GitConfiguration {
 		for (int i = 0; i < ps.length - 1; i++) {
 			map = (Map<String, Object>) map.get(ps[i]);
 			if (map == null) {
-				throw new GitTransactionsException("Missing property>" + path);
+				throw new GitTransactionsException("Missing property>" + path, null);
 			}
 		}
 		String result = (String) map.get(ps[ps.length - 1]);
