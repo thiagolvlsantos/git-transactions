@@ -1,5 +1,6 @@
 package io.github.thiagolvlsantos.git.transactions.config;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,9 +12,9 @@ import lombok.Data;
 @Configuration
 @ConfigurationProperties(prefix = "gitt")
 @Data
-public class GittConfig {
+public class GitConfiguration {
 
-	private Map<String, Object> repository;
+	private Map<String, Object> repository = new HashMap<>();
 
 	@SuppressWarnings("unchecked")
 	public String get(String path) {

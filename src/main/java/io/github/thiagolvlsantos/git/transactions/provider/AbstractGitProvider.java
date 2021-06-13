@@ -19,7 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.FileSystemUtils;
 
 import io.github.thiagolvlsantos.git.commons.file.FileUtils;
-import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
+import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	private Map<String, Git> gitsWrite = new ConcurrentHashMap<>();
 
 	protected String property(String group, String name) {
-		GittConfig config = context.getBean(GittConfig.class);
+		GitConfiguration config = context.getBean(GitConfiguration.class);
 		String tmp = config.get(group + "." + name);
 		if (tmp == null) {
 			return config.get(name);

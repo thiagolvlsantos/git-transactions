@@ -8,9 +8,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
-import io.github.thiagolvlsantos.git.transactions.config.GittConfig;
+import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 
-@ContextConfiguration(classes = GittConfig.class)
+@ContextConfiguration(classes = GitConfiguration.class)
 @SpringBootTest
 @ComponentScan("io.github.thiagolvlsantos")
 @Import(ServiceWriteNotify.class)
