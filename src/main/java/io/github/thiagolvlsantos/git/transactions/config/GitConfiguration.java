@@ -7,11 +7,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
-import lombok.Data;
+import lombok.Setter;
 
 @Configuration
 @ConfigurationProperties(prefix = "gitt")
-@Data
+@Setter
 public class GitConfiguration {
 
 	private Map<String, Object> repository = new HashMap<>();
