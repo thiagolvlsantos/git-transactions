@@ -23,25 +23,35 @@ class GitConfigurationTest {
 
 	@BeforeEach
 	public void before() {
+		// Emulates:
+		//
+		// gitt.repository.base=data1
+		// gitt.repository.all.other=data2
+		//
+		// gitt.repository.project_template.url=http://$route$
+		// gitt.repository.project_template.other=#{null}
+
 		config = new GitConfiguration();
 
 		Map<String, Object> repo = new HashMap<>();
 		repo.put("base", "data1");
 
 		Map<String, Object> all = new HashMap<>();
-		all.put("other", "data2");
 		repo.put("all", all);
+		all.put("other", "data2");
 
-		Map<String, Object> tmp = new HashMap<>();
-		tmp.put("url", "http://$route$");
-		repo.put("project_template", tmp);
+		Map<String, Object> template = new HashMap<>();
+		template.put("url", "http://$route$");
+		template.put("other", null);
+		repo.put("project_template", template);
 
 		config.setRepository(repo);
 	}
 
 	@Test
-	void templateValue() {
+	void templateValues() {
 		assertThat(config.get("project_template.url")).isEqualTo("http://template");
+		assertThat(config.get("project_template.olther")).isNull();
 	}
 
 	@ParameterizedTest
@@ -57,7 +67,7 @@ class GitConfigurationTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { "notfound", "all.notfound", "any.notfound" })
+	@ValueSource(strings = { "all.not.found" })
 	void notFoundValues(String property) {
 		assertThatThrownBy(() -> config.get(property))//
 				.isExactlyInstanceOf(GitTransactionsException.class)//
