@@ -2,6 +2,9 @@ package io.github.thiagolvlsantos.git.transactions.config;
 
 public class GitConstants {
 
+	public GitConstants() {
+	}
+
 	// profiles of some classes in packages.
 	public static final String PROFILE_TEST = "gitt_test";
 	public static final String PROFILE_WEB = "gitt_web";
