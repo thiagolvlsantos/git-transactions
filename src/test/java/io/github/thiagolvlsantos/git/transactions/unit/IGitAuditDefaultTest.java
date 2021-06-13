@@ -21,6 +21,6 @@ class IGitAuditDefaultTest {
 	@Test
 	void defined(@Autowired ApplicationContext ctx) throws Exception {
 		IGitAudit s = GitAuditHelper.audit(ctx);
-		assertThat(s.username()).isEqualTo("");
+		assertThat(s.username()).isEmpty();
 	}
 }
