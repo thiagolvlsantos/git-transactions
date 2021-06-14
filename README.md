@@ -11,7 +11,7 @@
 
 ## Transactions using Git repositories. 
 
-Imagine you reading/writting locally to your file system attached to your Git repository as a transaction in your service class. An abstraction, using Aspects, to read and write files in your file system and automatically have it pulled/commited/pushed to your Git repository.
+Imagine you reading/writting locally to your file system attached to your Git repository as a transaction in your service class. An abstraction, using Aspects, to read and write files in your file system and automatically have them pulled/commited/pushed to your Git repository.
 
 Welcome to ``git-transactions``, see bellow how simple it is.
 
