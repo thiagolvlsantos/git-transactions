@@ -111,6 +111,8 @@ public void writeProjectFile(String projectName) {
 
 Multiple combinations of read/write are allowed for different repositories. When mixing read and write, read repository downloads are performed first.
 
+A larger set of examples can be found in [test directory](../../tree/master/src/test/java/io/github/thiagolvlsantos/git/transactions/integration)
+
 ## Build
 
 Localy, from this root directory call Maven commands or `bin/<script name>` at our will.
