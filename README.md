@@ -9,7 +9,11 @@
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 
-Transactions using Git as repository.
+Transactions using Git as repository. 
+
+Imagine you can have read/write access to a Git repository as a transaction in your service class. An abstraction to read and write files in your file system and automatically have it commited/pushed to your Git repository.
+
+Now you have ``git-transactions``, see bellow how simple it is.
 
 
 ## Usage
@@ -24,9 +28,9 @@ Include latest version [![Maven Central](https://maven-badges.herokuapp.com/mave
 		</dependency>
 ```
 
-### Add repositories configurations
+## Add repositories configurations
 
-In application.properties add information about the repositories of interest.  The example bellow we have ``projects`` and ``deployments`` repositories.
+To your ``application.properties`` add information about the repositories of interest.  The example bellow we have ``projects`` and ``deployments`` repositories.
 
 ```properties
 # Shared configuration, if nothing more specific to a repo is used.
@@ -46,7 +50,7 @@ gitt.repository.deployments.write=data/write/deployments
 gitt.repository.deployments.remote=https://github.com/thiagolvlsantos/gitt-example-deployments.git
 ```
 
-### Add annotation ``@EnableGit``
+## Add annotation ``@EnableGit``
 
 ```java
 ...
@@ -56,7 +60,9 @@ public class Application {
 }
 ```
 
-### Add ``GitServices`` and ``@GitRead`` or ``@GitWrite`` to your service methods.
+If it somehow does not work, for while add ``@ComponentScan("io.github.thiagolvlsantos.git")`` to your Spring Application class.
+
+## Add ``GitServices`` and ``@GitRead`` or ``@GitWrite`` to your service methods.
 
 This following code shows how to read a file from Git which was automatically download. Once the Git was downloaded the navigation through its structure is straightforward.
 
