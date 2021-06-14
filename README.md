@@ -81,7 +81,7 @@ public String readProjectFile(String projectName) {
 ...
 ```
 
-If the user wants to send or update a file into a Git repository use ``@GitWrite(<repo>)`` and after method finalization the file is automatically commited/pushed to the Git repository.
+If the user wants to send or update files or directories into a Git repository use ``@GitWrite(<repo>)`` and after method finalization the changes are automatically commited/pushed to the Git repository.
 
 ```java
 ...
