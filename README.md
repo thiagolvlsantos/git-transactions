@@ -111,7 +111,7 @@ public void writeProjectFile(String projectName) {
 
 Multiple combinations of read/write are allowed for different repositories. When mixing read and write, read repository downloads are performed first.
 
-A larger set of examples can be found in [test directory](../../tree/master/src/test/java/io/github/thiagolvlsantos/git/transactions/integration)
+A larger set of examples can be found in [test directory](https://github.com/thiagolvlsantos/git-transactions/tree/master/src/test/java/io/github/thiagolvlsantos/git/transactions/integration)
 
 ## Build
 
