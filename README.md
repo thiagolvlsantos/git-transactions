@@ -62,7 +62,7 @@ public class Application {
 
 If it somehow does not work, for while add ``@ComponentScan("io.github.thiagolvlsantos.git")`` to your Spring Application class.
 
-## Add ``GitServices`` and ``@GitRead`` or ``@GitWrite`` to your service methods.
+## Add a reference to ``GitServices`` and annotate your methods with ``@GitRead`` or ``@GitWrite``.
 
 This following code shows how to read a file from Git which was automatically download. Once the Git was downloaded the navigation through its structure is straightforward.
 
