@@ -269,8 +269,10 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				log.debug("cleanWrite(success:{},{}):{} time={}", delete, key, dir, System.currentTimeMillis() - time);
 			}
 		} catch (IOException e) {
-			throw new GitAPIException(e.getMessage(), e) {
-			};
+			if (log.isDebugEnabled()) {
+				log.debug("cleanWrite(error:{},{}):time={} error={}", key, dir, System.currentTimeMillis() - time, e.getMessage());
+			}
+			// ignore failed deletion
 		}
 	}
 
