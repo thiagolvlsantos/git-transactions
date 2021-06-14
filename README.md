@@ -49,11 +49,11 @@ gitt.repository.deployments.write=data/write/deployments
 gitt.repository.deployments.remote=https://github.com/thiagolvlsantos/gitt-example-deployments.git
 ```
 
-## Add annotation ``@EnableGit``
+## Add annotation ``@EnableGitTransactions``
 
 ```java
 ...
-@EnableGit
+@EnableGitTransactions
 public class Application {
 	...main(String[] args) {...}
 }
