@@ -9,10 +9,10 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan("com.thiagolvlsantos.git.transactions")
+@ComponentScan("io.github.thiagolvlsantos.git.transactions")
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface EnableGitTransaction {
+public @interface EnableGitTransactions {
 }
