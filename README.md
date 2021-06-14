@@ -1,4 +1,4 @@
-## git-transactions
+# git-transactions
 
 [![CI with Maven](https://github.com/thiagolvlsantos/git-transactions/actions/workflows/maven.yml/badge.svg)](https://github.com/thiagolvlsantos/git-transactions/actions/workflows/maven.yml)
 [![CI with CodeQL](https://github.com/thiagolvlsantos/git-transactions/actions/workflows/codeql.yml/badge.svg)](https://github.com/thiagolvlsantos/git-transactions/actions/workflows/codeql.yml)
@@ -9,12 +9,11 @@
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 
-Transactions using Git as repository. 
+## Transactions using Git repositories. 
 
-Imagine you can have read/write access to a Git repository as a transaction in your service class. An abstraction to read and write files in your file system and automatically have it commited/pushed to your Git repository.
+Imagine you reading/writting locally to your file system attached to your Git repository as a transaction in your service class. An abstraction, using Aspects, to read and write files in your file system and automatically have it pulled/commited/pushed to your Git repository.
 
-Now you have ``git-transactions``, see bellow how simple it is.
-
+Welcome to ``git-transactions``, see bellow how simple it is.
 
 ## Usage
 
@@ -73,7 +72,7 @@ public class Application {
 
 ## Add a reference to ``GitServices`` and annotate your methods with ``@GitRead`` or ``@GitWrite``.
 
-This following code shows how to read a file from Git which was automatically download. Once the Git was downloaded the navigation through its structure is straightforward.
+This following code shows how to read a file from Git which was automatically download by ``@GitRead(<repo_name>)`` annotation. Once the Git was downloaded the navigation through its structure is straightforward.
 
 ```java
 ...
@@ -90,7 +89,7 @@ public String readProjectFile(String projectName) {
 ...
 ```
 
-If the user wants to send or update files or directories into a Git repository use ``@GitWrite(<repo>)`` and after method finalization the changes are automatically commited/pushed to the Git repository.
+If the user wants to send or update files or directories into a Git repository use ``@GitWrite(<repo_name>)`` and after method finalization the changes are automatically commited/pushed to the Git repository.
 
 ```java
 ...
