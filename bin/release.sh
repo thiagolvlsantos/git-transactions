@@ -1,1 +1,1 @@
-mvn -U -B -Prelease -DskipTests=true release:clean release:prepare 
+mvn -U -B -Prelease -DskipTests -Darguments=-DskipTests release:clean release:prepare 
