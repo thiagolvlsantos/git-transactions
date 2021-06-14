@@ -63,7 +63,7 @@ If it somehow does not work, for while add ``@ComponentScan`` to your Spring App
 
 ```java
 ...
-@ComponentScan("io.github.thiagolvlsantos.git")
+@ComponentScan("io.github.thiagolvlsantos.git.transactions")
 public class Application {
 	...main(String[] args) {...}
 }
