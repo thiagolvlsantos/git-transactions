@@ -60,7 +60,16 @@ public class Application {
 }
 ```
 
-If it somehow does not work, for while add ``@ComponentScan("io.github.thiagolvlsantos.git")`` to your Spring Application class.
+If it somehow does not work, for while add ``@ComponentScan`` to your Spring Application class.
+
+```java
+...
+@ComponentScan("io.github.thiagolvlsantos.git")
+public class Application {
+	...main(String[] args) {...}
+}
+```
+
 
 ## Add a reference to ``GitServices`` and annotate your methods with ``@GitRead`` or ``@GitWrite``.
 
