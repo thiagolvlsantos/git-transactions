@@ -250,7 +250,6 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	@Override
 	public void cleanWrite(String group) throws GitAPIException {
 		long time = System.currentTimeMillis();
@@ -270,7 +269,8 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			}
 		} catch (IOException e) {
 			if (log.isDebugEnabled()) {
-				log.debug("cleanWrite(error:{},{}):time={} error={}", key, dir, System.currentTimeMillis() - time, e.getMessage());
+				log.debug("cleanWrite(error:{},{}):time={} error={}", key, dir, System.currentTimeMillis() - time,
+						e.getMessage());
 			}
 			// ignore failed deletion
 		}

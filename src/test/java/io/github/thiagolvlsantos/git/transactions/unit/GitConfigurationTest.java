@@ -14,9 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 class GitConfigurationTest {
 
 	private GitConfiguration config;
