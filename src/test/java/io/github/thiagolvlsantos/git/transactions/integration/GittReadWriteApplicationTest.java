@@ -1,5 +1,7 @@
 package io.github.thiagolvlsantos.git.transactions.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +22,7 @@ class GittReadWriteApplicationTest {
 	void testReadWrite(@Autowired ApplicationContext ctx) throws Exception {
 		ServiceReadWrite s = ctx.getBean(ServiceReadWrite.class);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		s.mix();
+		assertThat(s.mix()).isTrue();
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

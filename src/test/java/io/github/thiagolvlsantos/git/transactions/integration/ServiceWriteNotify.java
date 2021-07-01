@@ -20,7 +20,7 @@ public class ServiceWriteNotify {
 	private @Autowired GitServices services;
 
 	@GitWrite(value = GITT_EXAMPLE_PROJECTS, watcher = false)
-	public void write() throws IOException {
+	public boolean write() throws IOException {
 		File directory = services.writeDirectory(GITT_EXAMPLE_PROJECTS);
 		System.out.println("...writeProjects..." + directory);
 		File file = new File(directory, "projectA.txt");
@@ -31,5 +31,6 @@ public class ServiceWriteNotify {
 			System.out.println(f.getName());
 		}
 		services.notify(this, GITT_EXAMPLE_PROJECTS, EFileStatus.CREATE, file);
+		return true;
 	}
 }

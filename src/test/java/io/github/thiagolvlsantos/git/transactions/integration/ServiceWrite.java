@@ -22,24 +22,27 @@ public class ServiceWrite {
 	private @Autowired GitServices services;
 
 	@GitWrite(GITT_EXAMPLE_PROJECTS)
-	public void write() throws Exception {
+	public boolean write() throws Exception {
 		dumpWrite("Write");
+		return true;
 	}
 
 	@GitWrite(value = GITT_EXAMPLE_PROJECTS, //
 			values = { //
 					@GitWriteDir(GITT_EXAMPLE_PRODUCTS) //
 			})
-	public void writeMix() throws Exception {
+	public boolean writeMix() throws Exception {
 		dumpWrite("Mix");
+		return true;
 	}
 
 	@GitWrite(values = { //
 			@GitWriteDir(GITT_EXAMPLE_PROJECTS), //
 			@GitWriteDir(GITT_EXAMPLE_PRODUCTS) //
 	})
-	public void writeDouble() throws Exception {
+	public boolean writeDouble() throws Exception {
 		dumpWrite("Double");
+		return true;
 	}
 
 	private void dumpWrite(String msg) throws FileNotFoundException, IOException {

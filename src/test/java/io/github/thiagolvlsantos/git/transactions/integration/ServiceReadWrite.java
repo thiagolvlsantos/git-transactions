@@ -29,9 +29,10 @@ public class ServiceReadWrite {
 	@GitRead(value = GITT_EXAMPLE_PROJECTS, values = { //
 			@GitReadDir(GITT_EXAMPLE_PRODUCTS) //
 	})
-	public void mix() throws Exception {
+	public boolean mix() throws Exception {
 		dumpRead("Mix");
 		dumpWrite("Mix");
+		return true;
 	}
 
 	private void dumpRead(String msg) {
