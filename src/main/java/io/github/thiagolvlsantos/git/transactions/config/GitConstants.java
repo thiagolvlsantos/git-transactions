@@ -2,7 +2,7 @@ package io.github.thiagolvlsantos.git.transactions.config;
 
 public class GitConstants {
 
-	public GitConstants() {
+	private GitConstants() {
 	}
 
 	// profiles of some classes in packages.
