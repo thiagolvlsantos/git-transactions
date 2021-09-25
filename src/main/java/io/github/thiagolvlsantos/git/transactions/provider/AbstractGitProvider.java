@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -283,19 +284,27 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	}
 
 	@Override
-	public Iterable<RevCommit> logRead(String group, String path) throws GitAPIException {
-		return log(group, path, gitRead(group));
+	public Iterable<RevCommit> logRead(String group, String path, Integer skip, Integer max) throws GitAPIException {
+		return log(group, path, gitRead(group), skip, max);
 	}
 
 	@Override
-	public Iterable<RevCommit> logWrite(String group, String path) throws GitAPIException {
-		return log(group, path, gitWrite(group));
+	public Iterable<RevCommit> logWrite(String group, String path, Integer skip, Integer max) throws GitAPIException {
+		return log(group, path, gitWrite(group), skip, max);
 	}
 
-	private Iterable<RevCommit> log(String group, String path, Git git) throws GitAPIException {
+	private Iterable<RevCommit> log(String group, String path, Git git, Integer skip, Integer max)
+			throws GitAPIException {
 		long time = System.currentTimeMillis();
 		String normalizedPath = normalizeRead(group, path);
-		Iterable<RevCommit> call = git.log().addPath(normalizedPath).call();
+		LogCommand command = git.log().addPath(normalizedPath);
+		if (skip != null) {
+			command = command.setSkip(skip);
+		}
+		if (max != null) {
+			command = command.setMaxCount(max);
+		}
+		Iterable<RevCommit> call = command.call();
 		if (log.isInfoEnabled()) {
 			log.info("log({}):{}, time={}", group, normalizedPath, System.currentTimeMillis() - time);
 		}
