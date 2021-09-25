@@ -2,14 +2,20 @@ package io.github.thiagolvlsantos.git.transactions.provider;
 
 public interface IGitAudit {
 
-	default String username() {
-		return "";
-	}
+	String username();
 
-	default String email() {
-		return "";
-	}
+	String email();
 
 	IGitAudit INSTANCE = new IGitAudit() {
+
+		@Override
+		public String username() {
+			return "";
+		}
+
+		@Override
+		public String email() {
+			return "";
+		}
 	};
 }
