@@ -22,6 +22,7 @@ import io.github.thiagolvlsantos.git.commons.file.FileUtils;
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
+import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -207,12 +208,17 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	}
 
 	protected RevCommit commit(String group, String msg, Git git) throws GitAPIException {
-		IGitAudit audit = GitAuditHelper.audit(context);
 		long time = System.currentTimeMillis();
-		RevCommit call = git.commit().setAuthor(audit.username(), audit.email()).setMessage(msg).call();
+		IGitAudit audit = GitAuditHelper.audit(context);
+		UserInfo author = audit.author();
+		UserInfo commiter = audit.committer();
+		RevCommit call = git.commit()//
+				.setAuthor(author.getUser(), audit.author().getEmail())//
+				.setCommitter(commiter.getUser(), commiter.getEmail())//
+				.setMessage(msg).call();
 		if (log.isDebugEnabled()) {
-			log.debug("commit({}) time={}: {}, {} -> {}", group, System.currentTimeMillis() - time, audit.username(),
-					audit.email(), msg);
+			log.debug("commit({}) time={}: ({}, {}) -> {}", group, System.currentTimeMillis() - time, author, commiter,
+					msg);
 		}
 		return call;
 	}

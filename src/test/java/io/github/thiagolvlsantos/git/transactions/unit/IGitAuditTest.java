@@ -23,14 +23,17 @@ class IGitAuditTest {
 		@Bean
 		public IGitAudit audit() {
 			return new IGitAudit() {
+
+				private UserInfo info = new UserInfo(NAME, EMAIL);
+
 				@Override
-				public String username() {
-					return NAME;
+				public UserInfo author() {
+					return info;
 				}
 
 				@Override
-				public String email() {
-					return EMAIL;
+				public UserInfo committer() {
+					return info;
 				}
 			};
 		}
@@ -39,7 +42,9 @@ class IGitAuditTest {
 	@Test
 	void defined(@Autowired ApplicationContext ctx) throws Exception {
 		IGitAudit s = GitAuditHelper.audit(ctx);
-		assertThat(s.username()).isEqualTo(NAME);
-		assertThat(s.email()).isEqualTo(EMAIL);
+		assertThat(s.author().getUser()).isEqualTo(NAME);
+		assertThat(s.author().getEmail()).isEqualTo(EMAIL);
+		assertThat(s.committer().getUser()).isEqualTo(NAME);
+		assertThat(s.committer().getEmail()).isEqualTo(EMAIL);
 	}
 }

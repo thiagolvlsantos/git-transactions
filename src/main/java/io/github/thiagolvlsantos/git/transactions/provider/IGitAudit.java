@@ -1,21 +1,39 @@
 package io.github.thiagolvlsantos.git.transactions.provider;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 public interface IGitAudit {
 
-	String username();
+	UserInfo author();
 
-	String email();
+	UserInfo committer();
 
 	IGitAudit INSTANCE = new IGitAudit() {
 
+		private UserInfo empty = new UserInfo("", "");
+
 		@Override
-		public String username() {
-			return "";
+		public UserInfo author() {
+			return empty;
 		}
 
 		@Override
-		public String email() {
-			return "";
+		public UserInfo committer() {
+			return empty;
 		}
 	};
+
+	@Setter
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@ToString
+	public static class UserInfo {
+		private String user;
+		private String email;
+	}
 }
