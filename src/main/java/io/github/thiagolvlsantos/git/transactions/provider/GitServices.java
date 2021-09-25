@@ -78,7 +78,7 @@ public class GitServices {
 	}
 
 	@SneakyThrows
-	public Iterable<RevCommit> history(String group, Object key) {
-		return context.getBean(IGitProvider.class).logRead(group, String.valueOf(key));
+	public Iterable<RevCommit> history(String group, File path) {
+		return context.getBean(IGitProvider.class).logRead(group, String.valueOf(path));
 	}
 }
