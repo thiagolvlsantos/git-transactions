@@ -11,6 +11,7 @@ import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
@@ -38,6 +39,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	private @Autowired ApplicationContext context;
 	private Map<String, Git> gitsRead = new ConcurrentHashMap<>();
 	private Map<String, Git> gitsWrite = new ConcurrentHashMap<>();
+	private Map<String, File> gitsCommits = new ConcurrentHashMap<>();
 
 	protected String property(String group, String name) {
 		GitConfiguration config = context.getBean(GitConfiguration.class);
@@ -61,8 +63,38 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	}
 
 	@Override
+	public void setCommit(String group, String commit) {
+		if (commit != null) {
+			long t = System.currentTimeMillis();
+			// is a commit is set read behaves like write, 'repo' is disposed
+			try {
+				// redo action as write
+				pullWrite(group);
+				// the target directory should replace 'readDirectory'
+				gitsCommits.put(group, directoryWrite(group));
+				// the repository
+				Git git = gitWrite(group);
+				// is reset to the commit state
+				Ref call = git.checkout().setName(commit).call();
+				if (log.isInfoEnabled()) {
+					log.info("Checkout of ({},{}): time={}, call={}", commit, System.currentTimeMillis() - t, call);
+				}
+			} catch (GitAPIException e) {
+				if (log.isErrorEnabled()) {
+					log.error("Checkout not performed ({}): time={}, error={}", commit, System.currentTimeMillis() - t,
+							e.getMessage());
+				}
+				if (log.isDebugEnabled()) {
+					log.debug(e.getMessage(), e);
+				}
+				throw new GitTransactionsException(e.getMessage(), e);
+			}
+		}
+	}
+
+	@Override
 	public File directoryRead(String group) {
-		return new File(read(group));
+		return gitsCommits.containsKey(group) ? gitsCommits.get(group) : new File(read(group));
 	}
 
 	@Override
@@ -254,6 +286,10 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("cleanRead({}):{} NOP time={}", key, dir, System.currentTimeMillis() - time);
+		}
+
+		if (gitsCommits.containsKey(group)) {
+			cleanWrite(group);
 		}
 	}
 

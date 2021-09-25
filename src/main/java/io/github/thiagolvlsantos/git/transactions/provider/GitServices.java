@@ -23,6 +23,10 @@ public class GitServices {
 	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
 
+	public void setCommit(String group, String commit) {
+		context.getBean(IGitProvider.class).setCommit(group, commit);
+	}
+
 	public File readDirectory(String group) {
 		return context.getBean(IGitProvider.class).directoryRead(group);
 	}
