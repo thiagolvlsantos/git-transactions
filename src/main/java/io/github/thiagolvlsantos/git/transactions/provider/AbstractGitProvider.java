@@ -77,7 +77,8 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				// is reset to the commit state
 				Ref call = git.checkout().setName(commit).call();
 				if (log.isInfoEnabled()) {
-					log.info("Checkout of ({},{}): time={}, call={}", commit, System.currentTimeMillis() - t, call);
+					log.info("Checkout of ({}): time={}, call={}", commit, System.currentTimeMillis() - t,
+							call != null ? call.getName() : null);
 				}
 			} catch (GitAPIException e) {
 				if (log.isErrorEnabled()) {
