@@ -334,6 +334,9 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			throws GitAPIException {
 		long time = System.currentTimeMillis();
 		String normalizedPath = normalizeRead(group, path);
+		if (normalizedPath.isEmpty()) {
+			normalizedPath = read(group);
+		}
 		LogCommand command = git.log().addPath(normalizedPath);
 		if (skip != null) {
 			command = command.setSkip(skip);
