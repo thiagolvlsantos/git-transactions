@@ -17,8 +17,7 @@ public class BasicRead {
 
 	private @Autowired GitServices services;
 
-	@GitRead("projects")
-	public boolean read() throws IOException {
+	private String readContent() throws IOException {
 		File dir = services.readDirectory("projects");
 		for (File f : dir.listFiles()) {
 			System.out.println(f.getName());
@@ -27,6 +26,17 @@ public class BasicRead {
 		if (log.isInfoEnabled()) {
 			log.info("CONTENT(projectA.txt):" + content);
 		}
-		return content.contains("\"name\": \"projectA\"");
+		return content;
+	}
+
+	@GitRead("projects")
+	public boolean read() throws IOException {
+		return readContent().contains("\"name\": \"projectA\"");
+	}
+
+	@GitRead("projects")
+	public String readAt(Long timestamp) throws IOException {
+		services.setTimestamp("projects", timestamp);
+		return readContent();
 	}
 }
