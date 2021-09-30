@@ -2,8 +2,10 @@ package io.github.thiagolvlsantos.git.transactions.provider;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jgit.api.Git;
@@ -11,8 +13,12 @@ import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevSort;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -25,6 +31,7 @@ import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit.UserInfo;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -63,6 +70,46 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	}
 
 	@Override
+	public void setTimestamp(String group, Long timestamp) {
+		if (timestamp != null) {
+			String commit = findCommit(group, timestamp);
+			if (commit != null) {
+				if (log.isInfoEnabled()) {
+					log.info("Commit for (" + new Date(timestamp) + ") = " + commit);
+				}
+				setCommit(group, commit);
+			}
+		}
+	}
+
+	@SneakyThrows
+	private String findCommit(String group, Long timestamp) {
+		TreeMap<Date, RevCommit> commits = commitsBefore(group, timestamp);
+		return commits.isEmpty() ? null : commits.lastEntry().getValue().getName();
+	}
+
+	@SneakyThrows
+	private TreeMap<Date, RevCommit> commitsBefore(String group, Long timestamp) {
+		TreeMap<Date, RevCommit> result = new TreeMap<Date, RevCommit>();
+		Date execDate = new Date(timestamp);
+		Git git = gitRead(group);
+		Repository repo = git.getRepository();
+		try (RevWalk walk = new RevWalk(repo)) {
+			walk.markStart(walk.parseCommit(repo.resolve(Constants.HEAD)));
+			walk.sort(RevSort.COMMIT_TIME_DESC);
+			// walk.setTreeFilter(PathFilter.create(path)); // in case of path is required
+			for (RevCommit commit : walk) {
+				if (commit.getCommitterIdent().getWhen().before(execDate)) {
+					Date commitTime = commit.getCommitterIdent().getWhen();
+					result.put(commitTime, commit);
+				}
+			}
+			walk.close();
+		}
+		return result;
+	}
+
+	@Override
 	public void setCommit(String group, String commit) {
 		if (commit != null) {
 			long t = System.currentTimeMillis();
@@ -77,13 +124,13 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				// is reset to the commit state
 				Ref call = git.checkout().setName(commit).call();
 				if (log.isInfoEnabled()) {
-					log.info("Checkout of ({}): time={}, call={}", commit, System.currentTimeMillis() - t,
+					log.info("Checkout of (commit={}): time={}, call={}", commit, System.currentTimeMillis() - t,
 							call != null ? call.getName() : null);
 				}
 			} catch (GitAPIException e) {
 				if (log.isErrorEnabled()) {
-					log.error("Checkout not performed ({}): time={}, error={}", commit, System.currentTimeMillis() - t,
-							e.getMessage());
+					log.error("Checkout not performed (commit={}): time={}, error={}", commit,
+							System.currentTimeMillis() - t, e.getMessage());
 				}
 				if (log.isDebugEnabled()) {
 					log.debug(e.getMessage(), e);

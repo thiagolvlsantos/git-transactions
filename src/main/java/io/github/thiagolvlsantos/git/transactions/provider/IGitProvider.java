@@ -11,6 +11,8 @@ import org.eclipse.jgit.transport.PushResult;
 
 public interface IGitProvider {
 
+	void setTimestamp(String group, Long timestamp);
+
 	void setCommit(String group, String commit);
 
 	File directoryRead(String group);
