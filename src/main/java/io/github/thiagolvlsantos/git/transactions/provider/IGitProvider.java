@@ -11,9 +11,9 @@ import org.eclipse.jgit.transport.PushResult;
 
 public interface IGitProvider {
 
-	void setTimestamp(String group, Long timestamp);
+	void setTimestamp(String group, Long timestamp) throws GitAPIException;
 
-	void setCommit(String group, String commit);
+	void setCommit(String group, String commit) throws GitAPIException;
 
 	File directoryRead(String group);
 

@@ -31,7 +31,6 @@ import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit.UserInfo;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -70,7 +69,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	}
 
 	@Override
-	public void setTimestamp(String group, Long timestamp) {
+	public void setTimestamp(String group, Long timestamp) throws GitAPIException {
 		if (timestamp != null) {
 			String commit = findCommit(group, timestamp);
 			if (commit != null) {
@@ -82,28 +81,33 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		}
 	}
 
-	@SneakyThrows
-	private String findCommit(String group, Long timestamp) {
+	protected String findCommit(String group, Long timestamp) throws GitAPIException {
 		TreeMap<Date, RevCommit> commits = commitsBefore(group, timestamp);
 		return commits.isEmpty() ? null : commits.lastEntry().getValue().getName();
 	}
 
-	@SneakyThrows
-	private TreeMap<Date, RevCommit> commitsBefore(String group, Long timestamp) {
+	protected TreeMap<Date, RevCommit> commitsBefore(String group, Long timestamp) throws GitAPIException {
 		TreeMap<Date, RevCommit> result = new TreeMap<>();
-		Date time = new Date(timestamp);
-		Git git = gitRead(group);
-		Repository repo = git.getRepository();
-		try (RevWalk walk = new RevWalk(repo)) {
-			walk.markStart(walk.parseCommit(repo.resolve(Constants.HEAD)));
-			walk.sort(RevSort.COMMIT_TIME_DESC);
-			// walk.setTreeFilter(PathFilter.create(path)); // in case of path is required
-			for (RevCommit commit : walk) {
-				Date when = commit.getCommitterIdent().getWhen();
-				if (when.before(time)) {
-					result.put(when, commit);
+		try {
+			Date time = new Date(timestamp);
+			Git git = gitRead(group);
+			Repository repo = git.getRepository();
+			try (RevWalk walk = new RevWalk(repo)) {
+				walk.markStart(walk.parseCommit(repo.resolve(Constants.HEAD)));
+				walk.sort(RevSort.COMMIT_TIME_DESC);
+				// walk.setTreeFilter(PathFilter.create(path)); // in case of path is required
+				for (RevCommit commit : walk) {
+					Date when = commit.getCommitterIdent().getWhen();
+					if (when.before(time)) {
+						result.put(when, commit);
+					}
 				}
 			}
+		} catch (IOException e) {
+			if (log.isDebugEnabled()) {
+				log.debug(e.getMessage(), e);
+			}
+			throw new GitTransactionsException(e.getMessage(), e);
 		}
 		return result;
 	}
