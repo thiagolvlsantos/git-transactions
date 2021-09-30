@@ -25,3 +25,4 @@ jobs:
       run: mvn -U -B --no-transfer-progress package --file pom.xml
       env:
         GIT_TOKEN: ${{ secrets.GIT_TOKEN }} # for tests
+        TOOL: maven
