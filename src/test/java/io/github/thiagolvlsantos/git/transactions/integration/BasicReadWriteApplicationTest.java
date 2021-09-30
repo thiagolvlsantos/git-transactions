@@ -33,7 +33,7 @@ class BasicReadWriteApplicationTest {
 		long base = System.currentTimeMillis();
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		String readBefore = r.readAt(System.currentTimeMillis());
+		String readBefore = r.readCurrent();
 		assertThat(readBefore).isEqualTo(writeBefore);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
@@ -44,7 +44,7 @@ class BasicReadWriteApplicationTest {
 		assertThat(writeAfter).contains("projectA");
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-		String readAfter = r.readAt(System.currentTimeMillis());
+		String readAfter = r.readCurrent();
 		assertThat(readAfter).isEqualTo(writeAfter);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 

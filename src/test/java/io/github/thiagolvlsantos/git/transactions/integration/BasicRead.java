@@ -35,6 +35,11 @@ public class BasicRead {
 	}
 
 	@GitRead("projects")
+	public String readCurrent() throws IOException {
+		return readContent();
+	}
+
+	@GitRead("projects")
 	public String readAt(Long timestamp) throws IOException {
 		services.setTimestamp("projects", timestamp);
 		return readContent();
