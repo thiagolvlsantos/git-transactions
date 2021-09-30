@@ -23,10 +23,12 @@ public class GitServices {
 	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
 
+	@SneakyThrows
 	public void setTimestamp(String group, Long timestamp) {
 		context.getBean(IGitProvider.class).setTimestamp(group, timestamp);
 	}
 
+	@SneakyThrows
 	public void setCommit(String group, String commit) {
 		context.getBean(IGitProvider.class).setCommit(group, commit);
 	}
