@@ -20,9 +20,14 @@ public class BasicWrite {
 
 	@GitWrite("projects")
 	public String write() throws Exception {
+		return write("");
+	}
+
+	@GitWrite("projects")
+	public String write(String tool) throws Exception {
 		String projectName = "projectA";
 		File dirProjects = services.writeDirectory("projects");
-		File newFile = new File(dirProjects, projectName + ".txt");
+		File newFile = new File(dirProjects, tool + projectName + ".txt");
 		if (newFile.exists() && log.isInfoEnabled()) {
 			log.info("BEFORE:" + Files.readString(newFile.toPath()));
 		}

@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
@@ -23,33 +24,34 @@ class BasicReadWriteApplicationTest {
 		BasicWrite s = ctx.getBean(BasicWrite.class);
 		BasicRead r = ctx.getBean(BasicRead.class);
 
+		String tool = ctx.getBean(Environment.class).getProperty("tool");
 		// # FIRST WRITE
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		String writeBefore = s.write();
+		String writeBefore = s.write(tool);
 		assertThat(writeBefore).contains("projectA");
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
 		long base = System.currentTimeMillis();
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		String readBefore = r.readCurrent();
+		String readBefore = r.readCurrent(tool);
 		assertThat(readBefore).isEqualTo(writeBefore);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
 		// # SECOND WRITE
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-		String writeAfter = s.write();
+		String writeAfter = s.write(tool);
 		assertThat(writeAfter).contains("projectA");
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-		String readAfter = r.readCurrent();
+		String readAfter = r.readCurrent(tool);
 		assertThat(readAfter).isEqualTo(writeAfter);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
 		// # Read at date before should be equals to read after
-		String readAt = r.readAt(base);
+		String readAt = r.readAt(tool, base);
 		assertThat(readAt).isEqualTo(readBefore);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}

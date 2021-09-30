@@ -17,31 +17,31 @@ public class BasicRead {
 
 	private @Autowired GitServices services;
 
-	private String readContent() throws IOException {
+	private String readContent(String tool) throws IOException {
 		File dir = services.readDirectory("projects");
 		for (File f : dir.listFiles()) {
 			System.out.println(f.getName());
 		}
-		String content = Files.readString(new File(dir, "projectA.txt").toPath());
+		String content = Files.readString(new File(dir, tool + "projectA.txt").toPath());
 		if (log.isInfoEnabled()) {
-			log.info("CONTENT(projectA.txt):" + content);
+			log.info("CONTENT(" + tool + "projectA.txt):" + content);
 		}
 		return content;
 	}
 
 	@GitRead("projects")
 	public boolean read() throws IOException {
-		return readContent().contains("\"name\": \"projectA\"");
+		return readContent("").contains("\"name\": \"projectA\"");
 	}
 
 	@GitRead("projects")
-	public String readCurrent() throws IOException {
-		return readContent();
+	public String readCurrent(String tool) throws IOException {
+		return readContent(tool);
 	}
 
 	@GitRead("projects")
-	public String readAt(Long timestamp) throws IOException {
+	public String readAt(String tool, Long timestamp) throws IOException {
 		services.setTimestamp("projects", timestamp);
-		return readContent();
+		return readContent(tool);
 	}
 }
