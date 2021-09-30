@@ -91,7 +91,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	@SneakyThrows
 	private TreeMap<Date, RevCommit> commitsBefore(String group, Long timestamp) {
 		TreeMap<Date, RevCommit> result = new TreeMap<>();
-		Date execDate = new Date(timestamp);
+		Date time = new Date(timestamp);
 		Git git = gitRead(group);
 		Repository repo = git.getRepository();
 		try (RevWalk walk = new RevWalk(repo)) {
@@ -99,9 +99,9 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			walk.sort(RevSort.COMMIT_TIME_DESC);
 			// walk.setTreeFilter(PathFilter.create(path)); // in case of path is required
 			for (RevCommit commit : walk) {
-				if (commit.getCommitterIdent().getWhen().before(execDate)) {
-					Date commitTime = commit.getCommitterIdent().getWhen();
-					result.put(commitTime, commit);
+				Date when = commit.getCommitterIdent().getWhen();
+				if (when.before(time)) {
+					result.put(when, commit);
 				}
 			}
 		}
