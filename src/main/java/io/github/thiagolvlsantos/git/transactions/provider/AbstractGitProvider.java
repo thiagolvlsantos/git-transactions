@@ -90,7 +90,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 
 	@SneakyThrows
 	private TreeMap<Date, RevCommit> commitsBefore(String group, Long timestamp) {
-		TreeMap<Date, RevCommit> result = new TreeMap<Date, RevCommit>();
+		TreeMap<Date, RevCommit> result = new TreeMap<>();
 		Date execDate = new Date(timestamp);
 		Git git = gitRead(group);
 		Repository repo = git.getRepository();
@@ -104,7 +104,6 @@ public abstract class AbstractGitProvider implements IGitProvider {
 					result.put(commitTime, commit);
 				}
 			}
-			walk.close();
 		}
 		return result;
 	}
