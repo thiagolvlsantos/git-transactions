@@ -230,7 +230,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	protected Git instance(String group, File local, boolean silent) throws GitAPIException {
 		String remote = remote(group);
 		if (!silent && log.isInfoEnabled()) {
-			log.info("git({}): local:{}, remote:{}", group, local, remote);
+			log.info(getClass().getSimpleName() + ".git({}): local:{}, remote:{}", group, local, remote);
 		}
 		try {
 			return Git.open(local);
