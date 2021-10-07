@@ -39,7 +39,7 @@ public class GitReadAspect {
 		String name = signature.getName();
 		GitReadDynamic dynamic = getDynamic(getAnnotation(signature), jp);
 		long time = System.currentTimeMillis();
-		init(jp, dynamic);
+		init(jp, signature, dynamic);
 		if (log.isInfoEnabled()) {
 			log.info("** READ({}).init: {} ms, ({}) **", name, System.currentTimeMillis() - time, dynamic);
 		}
@@ -100,8 +100,9 @@ public class GitReadAspect {
 		return GitReadDynamic.builder().value(value).values(values).build();
 	}
 
-	private void init(ProceedingJoinPoint jp, GitReadDynamic annotation) {
-		publisher.publishEvent(new GitReadEvent(jp, annotation, EGitRead.INIT));
+	private void init(ProceedingJoinPoint jp, Signature signature, GitReadDynamic annotation) {
+		List<GitCommitValue> commits = GitCommitHelper.commitParameters(jp, signature);
+		publisher.publishEvent(new GitReadEvent(jp, annotation, EGitRead.INIT, commits));
 	}
 
 	private Object success(ProceedingJoinPoint jp, GitReadDynamic annotation, Object result) {

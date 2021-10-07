@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.github.thiagolvlsantos.git.transactions.GitServices;
+import io.github.thiagolvlsantos.git.transactions.read.GitCommit;
 import io.github.thiagolvlsantos.git.transactions.read.GitRead;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,14 +41,12 @@ public class BasicRead {
 	}
 
 	@GitRead("projects")
-	public String readAt(String tool, Long timestamp) throws IOException {
-		services.setTimestamp("projects", timestamp);
+	public String readAt(String tool, @GitCommit("projects") Long timestamp) throws IOException {
 		return readContent(tool);
 	}
 
 	@GitRead("projects")
-	public String readAtCommit(String tool, String commit) throws IOException {
-		services.setCommit("projects", commit);
+	public String readAtCommit(String tool, @GitCommit("projects") String commit) throws IOException {
 		return readContent(tool);
 	}
 

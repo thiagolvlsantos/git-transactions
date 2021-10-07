@@ -33,10 +33,12 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 			for (GitReadDirDynamic v : values) {
 				gs.add(v.value());
 			}
+			List<GitCommitValue> commits = event.getCommits();
 			for (String g : gs) {
 				switch (event.getType()) {
 				case INIT:
 					provider.pullRead(g);
+					setCommit(provider, g, findCommit(g, commits));
 					break;
 				case SUCCESS:
 					provider.pushRead(g);
@@ -53,4 +55,30 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 			throw new GitTransactionsException(e.getMessage(), e);
 		}
 	}
+
+	protected GitCommitValue findCommit(String group, List<GitCommitValue> commits) {
+		for (GitCommitValue tmp : commits) {
+			String annotationGroup = tmp.getAnnotation().value();
+			if (group.equalsIgnoreCase(annotationGroup)) {
+				return tmp;
+			}
+		}
+		return null;
+	}
+
+	protected void setCommit(IGitProvider provider, String group, GitCommitValue commitValue) throws GitAPIException {
+		if (commitValue != null) {
+			Object value = commitValue.getValue();
+			if (value instanceof String) {
+				provider.setCommit(group, String.valueOf(value));
+			} else if (value instanceof Number) {
+				provider.setTimestamp(group, (long) value);
+			} else {
+				throw new GitTransactionsException(
+						"Only 'String' (commit id) or 'Long' (timestamp) are allowed with @GitCommit annotation.",
+						null);
+			}
+		}
+	}
+
 }
