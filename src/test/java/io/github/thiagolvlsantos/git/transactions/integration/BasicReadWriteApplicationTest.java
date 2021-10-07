@@ -33,6 +33,7 @@ class BasicReadWriteApplicationTest {
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
 		long base = System.currentTimeMillis();
+		String commit = r.getCommit();
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		String readBefore = r.readCurrent(tool);
@@ -53,6 +54,11 @@ class BasicReadWriteApplicationTest {
 		// # Read at date before should be equals to read after
 		String readAt = r.readAt(tool, base);
 		assertThat(readAt).isEqualTo(readBefore);
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+		// # Read at date before should be equals to read after
+		String readAtCommit = r.readAtCommit(tool, commit);
+		assertThat(readAtCommit).isEqualTo(readBefore);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }

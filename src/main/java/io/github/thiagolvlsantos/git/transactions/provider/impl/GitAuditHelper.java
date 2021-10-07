@@ -1,8 +1,9 @@
-package io.github.thiagolvlsantos.git.transactions.provider;
+package io.github.thiagolvlsantos.git.transactions.provider.impl;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
+import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

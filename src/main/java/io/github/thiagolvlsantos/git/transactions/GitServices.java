@@ -1,4 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions.provider;
+package io.github.thiagolvlsantos.git.transactions;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 import io.github.thiagolvlsantos.git.transactions.file.EFileStatus;
 import io.github.thiagolvlsantos.git.transactions.file.FileEvent;
 import io.github.thiagolvlsantos.git.transactions.file.FileItem;
+import io.github.thiagolvlsantos.git.transactions.provider.IGitProvider;
+import io.github.thiagolvlsantos.git.transactions.provider.IGitRouter;
 import lombok.SneakyThrows;
 
 @Component
@@ -89,6 +91,7 @@ public class GitServices {
 
 	@SneakyThrows
 	public Iterable<RevCommit> history(String group, File path, Integer skip, Integer max) {
-		return context.getBean(IGitProvider.class).logRead(group, String.valueOf(path), skip, max);
+		return context.getBean(IGitProvider.class).logRead(group, path != null ? String.valueOf(path) : null, skip,
+				max);
 	}
 }

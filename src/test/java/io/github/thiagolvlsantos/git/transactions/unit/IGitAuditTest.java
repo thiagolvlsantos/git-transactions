@@ -9,8 +9,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 
-import io.github.thiagolvlsantos.git.transactions.provider.GitAuditHelper;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit;
+import io.github.thiagolvlsantos.git.transactions.provider.impl.GitAuditHelper;
 
 @ContextConfiguration(classes = IGitAuditTest.Config.class)
 @SpringBootTest

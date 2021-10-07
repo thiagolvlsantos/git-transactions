@@ -1,4 +1,4 @@
-package io.github.thiagolvlsantos.git.transactions.provider;
+package io.github.thiagolvlsantos.git.transactions.provider.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,10 @@ import org.springframework.util.FileSystemUtils;
 import io.github.thiagolvlsantos.git.commons.file.FileUtils;
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
-import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
+import io.github.thiagolvlsantos.git.transactions.id.impl.SessionIdHolderHelper;
+import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit.UserInfo;
+import io.github.thiagolvlsantos.git.transactions.provider.IGitProvider;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -383,11 +385,11 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	private Iterable<RevCommit> log(String group, String path, Git git, Integer skip, Integer max)
 			throws GitAPIException {
 		long time = System.currentTimeMillis();
+		LogCommand command = git.log();
 		String normalizedPath = normalizeRead(group, path);
-		if (normalizedPath.isEmpty()) {
-			normalizedPath = read(group);
+		if (normalizedPath != null) {
+			command = command.addPath(normalizedPath);
 		}
-		LogCommand command = git.log().addPath(normalizedPath);
 		if (skip != null) {
 			command = command.setSkip(skip);
 		}

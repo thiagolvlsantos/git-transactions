@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import io.github.thiagolvlsantos.git.transactions.id.ISessionIdHolder;
-import io.github.thiagolvlsantos.git.transactions.id.SessionIdHolderHelper;
+import io.github.thiagolvlsantos.git.transactions.id.impl.SessionIdHolderHelper;
 
 @ContextConfiguration(classes = ISessionIdHolderDefaultTest.Config.class)
 @SpringBootTest

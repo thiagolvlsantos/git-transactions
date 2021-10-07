@@ -1,5 +1,6 @@
-package io.github.thiagolvlsantos.git.transactions.id;
+package io.github.thiagolvlsantos.git.transactions.id.impl;
 
+import io.github.thiagolvlsantos.git.transactions.id.ISessionIdHolder;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

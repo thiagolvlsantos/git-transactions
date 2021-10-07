@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 
-import io.github.thiagolvlsantos.git.transactions.provider.GitAuditHelper;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitAudit;
+import io.github.thiagolvlsantos.git.transactions.provider.impl.GitAuditHelper;
 
 @ContextConfiguration(classes = IGitAuditDefaultTest.Config.class)
 @SpringBootTest

@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.github.thiagolvlsantos.git.transactions.provider.GitServices;
+import io.github.thiagolvlsantos.git.transactions.GitServices;
 import io.github.thiagolvlsantos.git.transactions.read.GitRead;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,5 +43,16 @@ public class BasicRead {
 	public String readAt(String tool, Long timestamp) throws IOException {
 		services.setTimestamp("projects", timestamp);
 		return readContent(tool);
+	}
+
+	@GitRead("projects")
+	public String readAtCommit(String tool, String commit) throws IOException {
+		services.setCommit("projects", commit);
+		return readContent(tool);
+	}
+
+	@GitRead("projects")
+	public String getCommit() {
+		return services.history("projects", null, 0, 1).iterator().next().getName();
 	}
 }

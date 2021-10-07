@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.github.thiagolvlsantos.git.transactions.provider.GitServices;
+import io.github.thiagolvlsantos.git.transactions.GitServices;
 import io.github.thiagolvlsantos.git.transactions.write.GitWrite;
 import lombok.extern.slf4j.Slf4j;
 
