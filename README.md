@@ -61,7 +61,9 @@ public class Application {
 
 ## Add a reference to ``GitServices`` and annotate your methods with ``@GitRead`` or ``@GitWrite``.
 
-This following code shows how to read a file from Git which was automatically download by ``@GitRead(<repo_name>)`` annotation. Once the Git was downloaded the navigation through its structure is straightforward.
+
+### Reading
+The following code shows how to read a file from Git which was automatically download by ``@GitRead(<repo_name>)`` annotation. Once the Git was downloaded the navigation through its structure is straightforward.
 
 ```java
 ...
@@ -77,6 +79,48 @@ public String readProjectFile(String projectName) {
 
 ...
 ```
+
+If you want to read contents of an specific revision, just pass the commit id in a `@GitCommit` annotated parameter as bellow:
+
+```java
+...
+private @Autowired GitServices gitServices;
+
+...
+
+@GitRead("projects")
+public String readProjectFile(String projectName, @GitCommit("projects") String commit) {
+	File dir = gitServices.readDirectory("projects");
+	return Files.readString(new File(dir,projectName+".json").toPath());
+}
+
+...
+```
+Or programatically set it whenever you want, for example, to compare content versions:
+
+```java
+...
+private @Autowired GitServices gitServices;
+
+...
+
+@GitRead("projects")
+public String readProjectFile(String projectName, String commit) {
+	File dir = gitServices.readDirectory("projects");
+	String current = Files.readString(new File(dir,projectName+".json").toPath());
+
+	gitServices.setCommit(commit);
+	dir = gitServices.readDirectory("projects");
+	String old = Files.readString(new File(dir,projectName+".json").toPath());
+	
+	//compare old with current
+}
+...
+```
+
+The same behavior can be achieved by using an 'Long' timestamp attribute annotated with `@GitCommit`, or using `services.setTimestamp(...)`.
+
+### Writing
 
 If the user wants to send or update files or directories into a Git repository use ``@GitWrite(<repo_name>)`` and after method finalization the changes are automatically commited/pushed to the Git repository.
 
@@ -100,7 +144,11 @@ public void writeProjectFile(String projectName) {
 
 Information about commit author/committer is provided by an implemention of ``IGitAudit`` you provide.
 
+### Read/Write
+
 Multiple combinations of read/write are allowed for different repositories. When mixing read and write, read repository downloads are performed first.
+
+### Examples
 
 A larger set of examples can be found in [test directory](https://github.com/thiagolvlsantos/git-transactions/tree/master/src/test/java/io/github/thiagolvlsantos/git/transactions/integration).
 
