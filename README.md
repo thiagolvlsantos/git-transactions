@@ -122,7 +122,7 @@ The same behavior can be achieved by using an 'Long' timestamp attribute annotat
 
 ### Writing
 
-If the user wants to send or update files or directories into a Git repository use ``@GitWrite(<repo_name>)`` and after method finalization the changes are automatically commited/pushed to the Git repository.
+If the user wants to send or update files or directories into a Git repository use ``@GitWrite(<repo_name>)`` and after method finalization the changes are automatically commited/pushed to the Git repository latest revision.
 
 ```java
 ...
