@@ -70,12 +70,12 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 		if (commitValue != null) {
 			Object value = commitValue.getValue();
 			if (value instanceof String) {
-				provider.setCommit(group, String.valueOf(value));
+				provider.setCommit(group, (String) value);
 			} else if (value instanceof Number) {
 				provider.setTimestamp(group, (long) value);
 			} else {
 				throw new GitTransactionsException(
-						"Only 'String' (commit id) or 'Long' (timestamp) are allowed with @GitCommit annotation.",
+						"Only 'String' (commit ids) or 'Long' (reading time) parameters are allowed with @GitCommit annotation.",
 						null);
 			}
 		}
