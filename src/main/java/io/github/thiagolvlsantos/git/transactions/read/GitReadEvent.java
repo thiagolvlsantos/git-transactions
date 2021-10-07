@@ -12,7 +12,7 @@ public class GitReadEvent extends ApplicationEvent {
 
 	private GitReadDynamic annotation;
 	private EGitRead type;
-	private List<GitCommitValue> commits;
+	private transient List<GitCommitValue> commits;
 	private transient Object result;
 	private Throwable error;
 
