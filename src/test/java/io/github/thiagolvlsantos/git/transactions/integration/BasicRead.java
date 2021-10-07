@@ -46,7 +46,19 @@ public class BasicRead {
 	}
 
 	@GitRead("projects")
+	public String readAtServices(String tool, Long timestamp) throws IOException {
+		services.setTimestamp("projects", timestamp);
+		return readContent(tool);
+	}
+
+	@GitRead("projects")
 	public String readAtCommit(String tool, @GitCommit("projects") String commit) throws IOException {
+		return readContent(tool);
+	}
+
+	@GitRead("projects")
+	public String readAtCommitServices(String tool, String commit) throws IOException {
+		services.setCommit("projects", commit);
 		return readContent(tool);
 	}
 

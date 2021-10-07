@@ -60,5 +60,15 @@ class BasicReadWriteApplicationTest {
 		String readAtCommit = r.readAtCommit(tool, commit);
 		assertThat(readAtCommit).isEqualTo(readBefore);
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+		// # Read at date before should be equals to read after
+		readAt = r.readAtServices(tool, base);
+		assertThat(readAt).isEqualTo(readBefore);
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+		// # Read at date before should be equals to read after
+		readAtCommit = r.readAtCommitServices(tool, commit);
+		assertThat(readAtCommit).isEqualTo(readBefore);
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 	}
 }
