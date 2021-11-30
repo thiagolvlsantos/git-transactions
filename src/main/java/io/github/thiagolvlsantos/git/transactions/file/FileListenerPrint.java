@@ -14,8 +14,6 @@ public class FileListenerPrint implements ApplicationListener<FileEvent> {
 
 	@Override
 	public void onApplicationEvent(FileEvent event) {
-		if (log.isInfoEnabled()) {
-			log.info("ITEMS: " + event.getItems());
-		}
+		log.info("ITEMS: {}", event.getItems());
 	}
 }

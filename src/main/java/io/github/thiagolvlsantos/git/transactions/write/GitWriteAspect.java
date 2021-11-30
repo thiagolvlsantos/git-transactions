@@ -44,21 +44,15 @@ public class GitWriteAspect {
 		long time = System.currentTimeMillis();
 		init(jp, dynamic);
 		startWatcher(dynamic);
-		if (log.isInfoEnabled()) {
-			log.info("** WRITE({}).init: {} ms, {} **", name, System.currentTimeMillis() - time, dynamic);
-		}
+		log.info("** WRITE({}).init: {} ms, {} **", name, System.currentTimeMillis() - time, dynamic);
 		try {
 			time = System.currentTimeMillis();
 			Object result = success(jp, dynamic, jp.proceed());
-			if (log.isInfoEnabled()) {
-				log.info("** WRITE({}).success: {} ms **", name, System.currentTimeMillis() - time);
-			}
+			log.info("** WRITE({}).success: {} ms **", name, System.currentTimeMillis() - time);
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, dynamic, e);
-			if (log.isErrorEnabled()) {
-				log.error("** WRITE({}).failure: {} ms **", name, System.currentTimeMillis() - time);
-			}
+			log.error("** WRITE({}).failure: {} ms **", name, System.currentTimeMillis() - time);
 			throw error;
 		} finally {
 			try {
@@ -70,9 +64,7 @@ public class GitWriteAspect {
 				for (GitWriteDirDynamic d : dynamic.values()) {
 					provider.cleanWrite(d.value());
 				}
-				if (log.isInfoEnabled()) {
-					log.info("** WRITE({}).finalyze: {} ms **", name, System.currentTimeMillis() - time);
-				}
+				log.info("** WRITE({}).finalyze: {} ms **", name, System.currentTimeMillis() - time);
 			} finally {
 				scope.closeAspect();
 			}

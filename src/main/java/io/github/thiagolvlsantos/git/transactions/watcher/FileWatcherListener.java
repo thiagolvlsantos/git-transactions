@@ -31,9 +31,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			stop(group, dir);
 			break;
 		default:
-			if (log.isInfoEnabled()) {
-				log.info("File watcher received: {}", event);
-			}
+			log.info("File watcher received: {}", event);
 		}
 	}
 
@@ -44,9 +42,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 				public void run() {
 					for (Watcher t : watchers.values()) {
 						t.finish();
-						if (log.isInfoEnabled()) {
-							log.info("Shutdown:" + t.getGroup());
-						}
+						log.info("Shutdown:{}", t.getGroup());
 					}
 				}
 			};
@@ -60,9 +56,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			}
 			return tmp;
 		});
-		if (log.isDebugEnabled()) {
-			log.debug("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
-		}
+		log.debug("FileWatcher.start({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		return tmp;
 	}
 
@@ -76,9 +70,7 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		if (tmp != null) {
 			tmp.finish();
 		}
-		if (log.isDebugEnabled()) {
-			log.debug("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
-		}
+		log.debug("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		return tmp;
 	}
 }

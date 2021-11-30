@@ -14,8 +14,6 @@ public class GitWriteListenerPrint implements ApplicationListener<GitWriteEvent>
 
 	@Override
 	public void onApplicationEvent(GitWriteEvent event) {
-		if (log.isInfoEnabled()) {
-			log.info("READ>>>>>" + event);
-		}
+		log.info("READ>>>>>{}", event);
 	}
 }

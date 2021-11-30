@@ -75,9 +75,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		if (timestamp != null) {
 			String commit = findCommit(group, timestamp);
 			if (commit != null) {
-				if (log.isInfoEnabled()) {
-					log.info("Commit for (" + new Date(timestamp) + ") = " + commit);
-				}
+				log.info("Commit for ({}) = {}", new Date(timestamp), commit);
 				setCommit(group, commit);
 			}
 		}
@@ -106,9 +104,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				}
 			}
 		} catch (IOException e) {
-			if (log.isDebugEnabled()) {
-				log.debug(e.getMessage(), e);
-			}
+			log.debug(e.getMessage(), e);
 			throw new GitTransactionsException(e.getMessage(), e);
 		}
 		return result;
@@ -128,18 +124,12 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				Git git = gitWrite(group);
 				// is reset to the commit state
 				Ref call = git.checkout().setName(commit).call();
-				if (log.isInfoEnabled()) {
-					log.info("Checkout of (commit={}): time={}, call={}", commit, System.currentTimeMillis() - t,
-							call != null ? call.getName() : null);
-				}
+				log.info("Checkout of (commit={}): time={}, call={}", commit, System.currentTimeMillis() - t,
+						call != null ? call.getName() : null);
 			} catch (GitAPIException e) {
-				if (log.isErrorEnabled()) {
-					log.error("Checkout not performed (commit={}): time={}, error={}", commit,
-							System.currentTimeMillis() - t, e.getMessage());
-				}
-				if (log.isDebugEnabled()) {
-					log.debug(e.getMessage(), e);
-				}
+				log.error("Checkout not performed (commit={}): time={}, error={}", commit,
+						System.currentTimeMillis() - t, e.getMessage());
+				log.debug(e.getMessage(), e);
 				throw new GitTransactionsException(e.getMessage(), e);
 			}
 		}
@@ -172,9 +162,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 
 	@Override
 	public CredentialsProvider credentials(String group) {
-		if (log.isDebugEnabled()) {
-			log.debug("credentials({})", group);
-		}
+		log.debug("credentials({})", group);
 		return new UsernamePasswordCredentialsProvider(property(group, REPO_USER), property(group, REPO_PASSWORD));
 	}
 
@@ -189,13 +177,11 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			try {
 				return instance(group, directoryRead(group), silent);
 			} catch (Exception e) {
-				if (log.isDebugEnabled()) {
-					log.debug(e.getMessage(), e);
-				}
+				log.debug(e.getMessage(), e);
 				throw new GitTransactionsException(e.getMessage(), e);
 			}
 		});
-		if (!silent && log.isDebugEnabled()) {
+		if (!silent) {
 			log.debug("gitRead.keys: {}", this.gitsRead.keySet());
 		}
 		return instance;
@@ -212,15 +198,11 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			try {
 				return instance(group, directoryWrite(group), false);
 			} catch (Exception e) {
-				if (log.isDebugEnabled()) {
-					log.debug(e.getMessage(), e);
-				}
+				log.debug(e.getMessage(), e);
 				throw new GitTransactionsException(e.getMessage(), e);
 			}
 		});
-		if (log.isDebugEnabled()) {
-			log.debug("gitWrite.keys: {}", this.gitsWrite.keySet());
-		}
+		log.debug("gitWrite.keys: {}", this.gitsWrite.keySet());
 		return instance;
 	}
 
@@ -231,8 +213,8 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	@SuppressWarnings("serial")
 	protected Git instance(String group, File local, boolean silent) throws GitAPIException {
 		String remote = remote(group);
-		if (!silent && log.isInfoEnabled()) {
-			log.info(getClass().getSimpleName() + ".git({}): local:{}, remote:{}", group, local, remote);
+		if (!silent) {
+			log.info("{}.git({}): local:{}, remote:{}", getClass().getSimpleName(), group, local, remote);
 		}
 		try {
 			return Git.open(local);
@@ -255,9 +237,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	protected PullResult pull(String group, Git git, String msg) throws GitAPIException {
 		long time = System.currentTimeMillis();
 		PullResult pull = git.pull().setCredentialsProvider(credentials(group)).call();
-		if (log.isDebugEnabled()) {
-			log.debug(msg + "({}) time={}", group, System.currentTimeMillis() - time);
-		}
+		log.debug("{}({}) time={}", msg, group, System.currentTimeMillis() - time);
 		return pull;
 	}
 
@@ -273,9 +253,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			}
 			throw new GitTransactionsException(e.getMessage(), e);
 		}
-		if (log.isDebugEnabled()) {
-			log.debug("copy({}) time={}", group, System.currentTimeMillis() - time);
-		}
+		log.debug("copy({}) time={}", group, System.currentTimeMillis() - time);
 		return pull(group, gitWrite(group), "pullWrite");
 	}
 
@@ -302,10 +280,8 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				.setAuthor(author.getUser(), author.getEmail())//
 				.setCommitter(commiter.getUser(), commiter.getEmail())//
 				.setMessage(msg).call();
-		if (log.isDebugEnabled()) {
-			log.debug("commit({}) time={}: ({}, {}) -> {}", group, System.currentTimeMillis() - time, author, commiter,
-					msg);
-		}
+		log.debug("commit({}) time={}: ({}, {}) -> {}", group, System.currentTimeMillis() - time, author, commiter,
+				msg);
 		return call;
 	}
 
@@ -322,9 +298,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	protected Iterable<PushResult> push(String group, Git git, String msg) throws GitAPIException {
 		long time = System.currentTimeMillis();
 		Iterable<PushResult> call = git.push().setCredentialsProvider(credentials(group)).call();
-		if (log.isDebugEnabled()) {
-			log.debug(msg + "({}) time={}", group, System.currentTimeMillis() - time);
-		}
+		log.debug("{}({}) time={}", msg, group, System.currentTimeMillis() - time);
 		return call;
 	}
 
@@ -337,9 +311,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		if (git != null) {
 			git.close();
 		}
-		if (log.isDebugEnabled()) {
-			log.debug("cleanRead({}):{} NOP time={}", key, dir, System.currentTimeMillis() - time);
-		}
+		log.debug("cleanRead({}):{} NOP time={}", key, dir, System.currentTimeMillis() - time);
 
 		if (gitsCommits.containsKey(group)) {
 			cleanWrite(group);
@@ -357,17 +329,13 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		}
 		try {
 			boolean delete = FileUtils.delete(dir);
-			if (!delete && log.isInfoEnabled()) {
+			if (!delete) {
 				log.info("Could not delete: {}", dir);
 			}
-			if (log.isDebugEnabled()) {
-				log.debug("cleanWrite(success:{},{}):{} time={}", delete, key, dir, System.currentTimeMillis() - time);
-			}
+			log.debug("cleanWrite(success:{},{}):{} time={}", delete, key, dir, System.currentTimeMillis() - time);
 		} catch (IOException e) {
-			if (log.isDebugEnabled()) {
-				log.debug("cleanWrite(error:{},{}):time={} error={}", key, dir, System.currentTimeMillis() - time,
-						e.getMessage());
-			}
+			log.debug("cleanWrite(error:{},{}):time={} error={}", key, dir, System.currentTimeMillis() - time,
+					e.getMessage());
 			// ignore failed deletion
 		}
 	}
@@ -397,9 +365,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			command = command.setMaxCount(max);
 		}
 		Iterable<RevCommit> call = command.call();
-		if (log.isInfoEnabled()) {
-			log.info("log({}):{}, time={}", group, normalizedPath, System.currentTimeMillis() - time);
-		}
+		log.info("log({}):{}, time={}", group, normalizedPath, System.currentTimeMillis() - time);
 		return call;
 	}
 }

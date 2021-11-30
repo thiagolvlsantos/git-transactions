@@ -47,9 +47,7 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 				commitWrite(group, msg, provider);
 			}
 		} catch (GitAPIException e) {
-			if (log.isDebugEnabled()) {
-				log.debug(e.getMessage(), e);
-			}
+			log.debug(e.getMessage(), e);
 			throw new GitTransactionsException(e.getMessage(), e);
 		}
 	}
@@ -58,37 +56,27 @@ public class FileListenerGit implements ApplicationListener<FileEvent> {
 		AddCommand add = git.add().addFilepattern(pattern);
 		msg.append("Added: " + pattern + "\n");
 		DirCache addResult = add.call();
-		if (log.isDebugEnabled()) {
-			log.debug(group + ".ADDED: " + addResult);
-		}
+		log.debug("{}.ADDED: {}", group, addResult);
 	}
 
 	private void modify(String group, Git git, StringBuilder msg, String pattern) throws GitAPIException {
 		AddCommand update = git.add().addFilepattern(pattern);
 		msg.append("Updated: " + pattern + "\n");
 		DirCache updateResult = update.call();
-		if (log.isDebugEnabled()) {
-			log.debug(group + ".UPDATED: " + updateResult);
-		}
+		log.debug("{}.UPDATED: {}", group, updateResult);
 	}
 
 	private void delete(String group, Git git, StringBuilder msg, String pattern) throws GitAPIException {
 		RmCommand delete = git.rm().addFilepattern(pattern);
 		msg.append("Deleted: " + pattern + "\n");
 		DirCache deleteResult = delete.call();
-		if (log.isDebugEnabled()) {
-			log.debug(group + ".DELETED: " + deleteResult);
-		}
+		log.debug("{}.DELETED: {}", group, deleteResult);
 	}
 
 	private void commitWrite(String group, StringBuilder msg, IGitProvider provider) throws GitAPIException {
 		String tmp = msg.toString();
-		if (log.isInfoEnabled()) {
-			log.info(group + ".MESSAGE:\n" + tmp);
-		}
+		log.info("{}.MESSAGE:\n{}", group, tmp);
 		RevCommit commit = provider.commitWrite(group, tmp);
-		if (log.isInfoEnabled()) {
-			log.info(group + ".COMMIT: " + commit);
-		}
+		log.info("{}.COMMIT: {}", group, commit);
 	}
 }

@@ -49,9 +49,7 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 				}
 			}
 		} catch (GitAPIException e) {
-			if (log.isDebugEnabled()) {
-				log.debug(e.getMessage(), e);
-			}
+			log.debug(e.getMessage(), e);
 			throw new GitTransactionsException(e.getMessage(), e);
 		}
 	}

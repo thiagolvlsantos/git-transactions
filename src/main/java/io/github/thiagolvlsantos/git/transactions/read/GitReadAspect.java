@@ -43,21 +43,15 @@ public class GitReadAspect {
 		GitReadDynamic dynamic = getDynamic(getAnnotation(signature), jp);
 		long time = System.currentTimeMillis();
 		init(jp, signature, dynamic);
-		if (log.isInfoEnabled()) {
-			log.info("** READ({}).init: {} ms, ({}) **", name, System.currentTimeMillis() - time, dynamic);
-		}
+		log.info("** READ({}).init: {} ms, ({}) **", name, System.currentTimeMillis() - time, dynamic);
 		try {
 			time = System.currentTimeMillis();
 			Object result = success(jp, dynamic, jp.proceed());
-			if (log.isInfoEnabled()) {
-				log.info("** READ({}).success: {} ms **", name, System.currentTimeMillis() - time);
-			}
+			log.info("** READ({}).success: {} ms **", name, System.currentTimeMillis() - time);
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, dynamic, e);
-			if (log.isErrorEnabled()) {
-				log.error("** READ({}).failure: {} ms **", name, System.currentTimeMillis() - time);
-			}
+			log.error("** READ({}).failure: {} ms **", name, System.currentTimeMillis() - time);
 			throw error;
 		} finally {
 			try {
@@ -69,9 +63,7 @@ public class GitReadAspect {
 				for (GitReadDirDynamic d : dynamic.values()) {
 					provider.cleanRead(d.value());
 				}
-				if (log.isInfoEnabled()) {
-					log.info("** READ({}).finalyze: {} ms **", name, System.currentTimeMillis() - time);
-				}
+				log.info("** READ({}).finalyze: {} ms **", name, System.currentTimeMillis() - time);
 			} finally {
 				scope.closeAspect();
 			}
