@@ -55,13 +55,17 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 	}
 
 	protected GitCommitValue findCommit(String group, List<GitCommitValue> commits) {
+		List<GitCommitValue> noNames = new LinkedList<GitCommitValue>();
 		for (GitCommitValue tmp : commits) {
 			String annotationGroup = tmp.getAnnotation().value();
 			if (group.equalsIgnoreCase(annotationGroup)) {
 				return tmp;
 			}
+			if (annotationGroup == null || annotationGroup.isEmpty()) {
+				noNames.add(tmp);
+			}
 		}
-		return null;
+		return noNames.isEmpty() ? null : noNames.get(0);
 	}
 
 	protected void setCommit(IGitProvider provider, String group, GitCommitValue commitValue) throws GitAPIException {
