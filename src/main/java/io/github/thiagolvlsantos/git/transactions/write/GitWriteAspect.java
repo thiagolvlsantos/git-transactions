@@ -18,7 +18,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import io.github.thiagolvlsantos.git.transactions.GitRepo;
-import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitProvider;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitRouter;
 import io.github.thiagolvlsantos.git.transactions.scope.AspectScope;
@@ -92,14 +91,10 @@ public class GitWriteAspect {
 						+ router.getDeclaredConstructor().newInstance().route(value, jp.getArgs());
 			}
 			if (value == null || value.isEmpty()) {
-				Object source = jp.getThis();
-				GitRepo repo = AnnotationUtils.findAnnotation(source.getClass(), GitRepo.class);
-				if (repo == null) {
-					throw new GitTransactionsException(
-							"Could not find repository name to use. Try use @GitWrite(<repo_name>) to the method or add @GitRepo(<repo_name>) to the class.",
-							null);
+				GitRepo repo = AnnotationUtils.findAnnotation(jp.getThis().getClass(), GitRepo.class);
+				if (repo != null) {
+					value = repo.value();
 				}
-				value = repo.value();
 			}
 			list = Stream.of(annotation.values())
 					.map(v -> GitWriteDirDynamic.builder().value(v.value()).watcher(v.watcher()).build())
