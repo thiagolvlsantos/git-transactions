@@ -276,12 +276,13 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		IGitAudit audit = GitAuditHelper.audit(context);
 		UserInfo author = audit.author();
 		UserInfo commiter = audit.committer();
+		String text = "Changes made by: " + author.getUser() + "/" + commiter.getUser() + "\n\n" + msg;
 		RevCommit call = git.commit()//
 				.setAuthor(author.getUser(), author.getEmail())//
 				.setCommitter(commiter.getUser(), commiter.getEmail())//
-				.setMessage(msg).call();
+				.setMessage(text).call();
 		log.debug("commit({}) time={}: ({}, {}) -> {}", group, System.currentTimeMillis() - time, author, commiter,
-				msg);
+				text);
 		return call;
 	}
 
