@@ -15,11 +15,11 @@ import io.github.thiagolvlsantos.git.transactions.file.FileEvent;
 import io.github.thiagolvlsantos.git.transactions.file.FileItem;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
 @Getter
-@Slf4j
 public class Watcher {
+	private static final String GIT_DIR = ".git";
+
 	private String group;
 	private FileAlterationObserver observer;
 	private FileAlterationListener listener;
@@ -30,7 +30,7 @@ public class Watcher {
 		this.group = group;
 		this.publisher = publisher;
 		this.observer = new FileAlterationObserver(dir.toFile(),
-				pathname -> !pathname.getAbsolutePath().contains(".git"));
+				pathname -> !pathname.getAbsolutePath().contains(GIT_DIR));
 		this.observer.checkAndNotify(); // initial setup
 		this.listener = new FileAlterationListenerAdaptor() {
 			@Override
