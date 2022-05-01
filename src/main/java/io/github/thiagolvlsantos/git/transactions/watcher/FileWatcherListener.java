@@ -30,6 +30,9 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 		case STOP:
 			stop(group, dir);
 			break;
+		case IGNORE:
+			ignore(group, dir);
+			break;
 		default:
 			log.info("File watcher received: {}", event);
 		}
@@ -71,6 +74,16 @@ public class FileWatcherListener implements ApplicationListener<FileWatcherEvent
 			tmp.finish();
 		}
 		log.debug("FileWatcher.stop({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
+		return tmp;
+	}
+
+	public Watcher ignore(String group, Path dir) {
+		String key = key(group, dir);
+		Watcher tmp = watchers.remove(key);
+		if (tmp != null) {
+			tmp.ignore();
+		}
+		log.debug("FileWatcher.ignore({}) size={}, keys={}", key, watchers.size(), watchers.keySet());
 		return tmp;
 	}
 }

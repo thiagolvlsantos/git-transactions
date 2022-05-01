@@ -126,31 +126,31 @@ public class GitWriteAspect {
 	}
 
 	private Object success(ProceedingJoinPoint jp, GitWriteDynamic annotation, Object result) {
-		stopWatcher(annotation);
+		stopWatcher(annotation, EWatcherAction.STOP);
 		GitWriteEvent event = new GitWriteEvent(jp, annotation, EGitWrite.SUCCESS, result);
 		publisher.publishEvent(event);
 		return event.getResult();
 	}
 
 	private Throwable error(ProceedingJoinPoint jp, GitWriteDynamic annotation, Throwable e) {
-		stopWatcher(annotation);
+		stopWatcher(annotation, EWatcherAction.IGNORE);
 		GitWriteEvent event = new GitWriteEvent(jp, annotation, EGitWrite.FAILURE, e);
 		publisher.publishEvent(event);
 		return event.getError();
 	}
 
-	private void stopWatcher(GitWriteDynamic annotation) {
+	private void stopWatcher(GitWriteDynamic annotation, EWatcherAction action) {
 		IGitProvider provider = context.getBean(IGitProvider.class);
 		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
 			Path path = provider.directoryWrite(group).toPath();
-			publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.STOP, group, path));
+			publisher.publishEvent(new FileWatcherEvent(this, action, group, path));
 		}
 		for (GitWriteDirDynamic d : annotation.values()) {
 			if (d.watcher()) {
 				String g = d.value();
 				Path p = provider.directoryWrite(g).toPath();
-				publisher.publishEvent(new FileWatcherEvent(this, EWatcherAction.STOP, g, p));
+				publisher.publishEvent(new FileWatcherEvent(this, action, g, p));
 			}
 		}
 	}

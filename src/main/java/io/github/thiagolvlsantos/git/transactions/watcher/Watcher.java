@@ -57,4 +57,9 @@ public class Watcher {
 		publisher.publishEvent(new FileEvent(this, group, items));
 		observer.destroy();
 	}
+
+	@SneakyThrows
+	public void ignore() {
+		observer.destroy();
+	}
 }

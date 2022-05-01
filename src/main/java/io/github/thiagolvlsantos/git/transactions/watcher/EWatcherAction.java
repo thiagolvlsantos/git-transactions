@@ -2,5 +2,5 @@ package io.github.thiagolvlsantos.git.transactions.watcher;
 
 public enum EWatcherAction {
 
-	START, STOP;
+	START, STOP, IGNORE;
 }
