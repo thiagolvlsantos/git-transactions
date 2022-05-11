@@ -55,7 +55,7 @@ public class GitReadListener implements ApplicationListener<GitReadEvent> {
 	}
 
 	protected GitCommitValue findCommit(String group, List<GitCommitValue> commits) {
-		List<GitCommitValue> noNames = new LinkedList<GitCommitValue>();
+		List<GitCommitValue> noNames = new LinkedList<>();
 		for (GitCommitValue tmp : commits) {
 			String annotationGroup = tmp.getAnnotation().value();
 			if (group.equalsIgnoreCase(annotationGroup)) {
