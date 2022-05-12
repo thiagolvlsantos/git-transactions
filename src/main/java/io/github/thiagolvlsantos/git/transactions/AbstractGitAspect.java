@@ -53,7 +53,7 @@ public abstract class AbstractGitAspect<A extends Annotation, P> {
 		if (signature instanceof MethodSignature) {
 			return AnnotationUtils.findAnnotation(((MethodSignature) signature).getMethod(), type);
 		}
-		throw new GitTransactionsException("Annotation @" + type.getSimpleName() + "  allowed only for methods.", null);
+		throw new GitTransactionsException("Annotation @" + type.getSimpleName() + " allowed only for methods.", null);
 	}
 
 	protected abstract P toDynamic(ProceedingJoinPoint jp, A annotation);
