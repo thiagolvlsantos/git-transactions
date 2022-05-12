@@ -14,7 +14,7 @@ import io.github.thiagolvlsantos.git.transactions.scope.AspectScope;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractGitAspect<A extends Annotation, P> {
+public abstract class AbstractGitAspect<A extends Annotation, D> {
 
 	protected @Autowired ApplicationContext context;
 
@@ -23,7 +23,7 @@ public abstract class AbstractGitAspect<A extends Annotation, P> {
 		scope.openAspect();
 		Signature signature = jp.getSignature();
 		A annotation = getAnnotation(signature, type);
-		P dynamic = toDynamic(jp, annotation);
+		D dynamic = toDynamic(jp, annotation);
 		long time = System.currentTimeMillis();
 		init(jp, dynamic);
 		String simpleName = type.getSimpleName();
@@ -56,13 +56,13 @@ public abstract class AbstractGitAspect<A extends Annotation, P> {
 		throw new GitTransactionsException("Annotation @" + type.getSimpleName() + " allowed only for methods.", null);
 	}
 
-	protected abstract P toDynamic(ProceedingJoinPoint jp, A annotation);
+	protected abstract D toDynamic(ProceedingJoinPoint jp, A annotation);
 
-	protected abstract void init(ProceedingJoinPoint jp, P annotation);
+	protected abstract void init(ProceedingJoinPoint jp, D dynamic);
 
-	protected abstract Object success(ProceedingJoinPoint jp, P annotation, Object result);
+	protected abstract Object success(ProceedingJoinPoint jp, D dynamic, Object result);
 
-	protected abstract Throwable error(ProceedingJoinPoint jp, P annotation, Throwable e);
+	protected abstract Throwable error(ProceedingJoinPoint jp, D dynamic, Throwable e);
 
-	protected abstract void finish(P dynamic);
+	protected abstract void finish(D dynamic);
 }

@@ -10,29 +10,29 @@ import lombok.Getter;
 @SuppressWarnings("serial")
 public class GitReadEvent extends ApplicationEvent {
 
-	private GitReadDynamic annotation;
+	private GitReadDynamic dynamic;
 	private EGitRead type;
 	private transient List<GitCommitValue> commits;
 	private transient Object result;
 	private Throwable error;
 
-	public GitReadEvent(Object source, GitReadDynamic annotation, EGitRead type, List<GitCommitValue> commits) {
+	public GitReadEvent(Object source, GitReadDynamic dynamic, EGitRead type, List<GitCommitValue> commits) {
 		super(source);
-		this.annotation = annotation;
+		this.dynamic = dynamic;
 		this.type = type;
 		this.commits = commits;
 	}
 
-	public GitReadEvent(Object source, GitReadDynamic annotation, EGitRead type, Object result) {
+	public GitReadEvent(Object source, GitReadDynamic dynamic, EGitRead type, Object result) {
 		super(source);
-		this.annotation = annotation;
+		this.dynamic = dynamic;
 		this.type = type;
 		this.result = result;
 	}
 
-	public GitReadEvent(Object source, GitReadDynamic annotation, EGitRead type, Throwable error) {
+	public GitReadEvent(Object source, GitReadDynamic dynamic, EGitRead type, Throwable error) {
 		super(source);
-		this.annotation = annotation;
+		this.dynamic = dynamic;
 		this.type = type;
 		this.error = error;
 	}

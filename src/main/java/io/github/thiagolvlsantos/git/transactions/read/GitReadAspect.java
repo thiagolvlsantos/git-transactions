@@ -62,9 +62,9 @@ public class GitReadAspect extends AbstractGitAspect<GitRead, GitReadDynamic> {
 	}
 
 	@Override
-	protected void init(ProceedingJoinPoint jp, GitReadDynamic annotation) {
+	protected void init(ProceedingJoinPoint jp, GitReadDynamic dynamic) {
 		List<GitCommitValue> commitParameters = commitParameters(jp, jp.getSignature());
-		publisher.publishEvent(new GitReadEvent(jp, annotation, EGitRead.INIT, commitParameters));
+		publisher.publishEvent(new GitReadEvent(jp, dynamic, EGitRead.INIT, commitParameters));
 	}
 
 	protected List<GitCommitValue> commitParameters(ProceedingJoinPoint jp, Signature signature) {
@@ -87,15 +87,15 @@ public class GitReadAspect extends AbstractGitAspect<GitRead, GitReadDynamic> {
 	}
 
 	@Override
-	protected Object success(ProceedingJoinPoint jp, GitReadDynamic annotation, Object result) {
-		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.SUCCESS, result);
+	protected Object success(ProceedingJoinPoint jp, GitReadDynamic dynamic, Object result) {
+		GitReadEvent event = new GitReadEvent(jp, dynamic, EGitRead.SUCCESS, result);
 		publisher.publishEvent(event);
 		return event.getResult();
 	}
 
 	@Override
-	protected Throwable error(ProceedingJoinPoint jp, GitReadDynamic annotation, Throwable e) {
-		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.FAILURE, e);
+	protected Throwable error(ProceedingJoinPoint jp, GitReadDynamic dynamic, Throwable e) {
+		GitReadEvent event = new GitReadEvent(jp, dynamic, EGitRead.FAILURE, e);
 		publisher.publishEvent(event);
 		return event.getError();
 	}

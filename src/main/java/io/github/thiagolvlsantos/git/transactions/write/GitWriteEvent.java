@@ -10,27 +10,27 @@ import lombok.ToString;
 @ToString
 public class GitWriteEvent extends ApplicationEvent {
 
-	private GitWriteDynamic annotation;
+	private GitWriteDynamic dynamic;
 	private EGitWrite type;
 	private transient Object result;
 	private Throwable error;
 
-	public GitWriteEvent(Object source, GitWriteDynamic annotation, EGitWrite type) {
+	public GitWriteEvent(Object source, GitWriteDynamic dynamic, EGitWrite type) {
 		super(source);
-		this.annotation = annotation;
+		this.dynamic = dynamic;
 		this.type = type;
 	}
 
-	public GitWriteEvent(Object source, GitWriteDynamic annotation, EGitWrite type, Object result) {
+	public GitWriteEvent(Object source, GitWriteDynamic dynamic, EGitWrite type, Object result) {
 		super(source);
-		this.annotation = annotation;
+		this.dynamic = dynamic;
 		this.type = type;
 		this.result = result;
 	}
 
-	public GitWriteEvent(Object source, GitWriteDynamic annotation, EGitWrite type, Throwable error) {
+	public GitWriteEvent(Object source, GitWriteDynamic dynamic, EGitWrite type, Throwable error) {
 		super(source);
-		this.annotation = annotation;
+		this.dynamic = dynamic;
 		this.type = type;
 		this.error = error;
 	}
