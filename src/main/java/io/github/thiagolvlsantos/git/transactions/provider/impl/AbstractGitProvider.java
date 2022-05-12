@@ -114,7 +114,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	public void setCommit(String group, String commit) {
 		if (commit != null) {
 			long t = System.currentTimeMillis();
-			// is a commit is set read behaves like write, 'repo' is disposed
+			// if a commit is set read behaves like write, 'repo' is disposable
 			try {
 				// redo action as write
 				pullWrite(group);

@@ -1,5 +1,6 @@
 package io.github.thiagolvlsantos.git.transactions.read;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.LinkedList;
@@ -41,9 +42,9 @@ public class GitReadAspect {
 		scope.openAspect();
 		Signature signature = jp.getSignature();
 		String name = signature.getName();
-		GitReadDynamic dynamic = getDynamic(getAnnotation(signature), jp);
+		GitReadDynamic dynamic = getDynamic(getAnnotation(signature, GitRead.class), jp);
 		long time = System.currentTimeMillis();
-		init(jp, signature, dynamic);
+		init(jp, dynamic);
 		log.info("** READ({}).init: {} ms, ({}) **", name, System.currentTimeMillis() - time, dynamic);
 		try {
 			time = System.currentTimeMillis();
@@ -71,15 +72,15 @@ public class GitReadAspect {
 		}
 	}
 
-	private GitRead getAnnotation(Signature signature) {
+	protected <T extends Annotation> T getAnnotation(Signature signature, Class<T> type) {
 		if (signature instanceof MethodSignature) {
-			return AnnotationUtils.findAnnotation(((MethodSignature) signature).getMethod(), GitRead.class);
+			return AnnotationUtils.findAnnotation(((MethodSignature) signature).getMethod(), type);
 		}
 		return null;
 	}
 
 	@SneakyThrows
-	private GitReadDynamic getDynamic(GitRead annotation, ProceedingJoinPoint jp) {
+	protected GitReadDynamic getDynamic(GitRead annotation, ProceedingJoinPoint jp) {
 		String value = null;
 		List<GitReadDirDynamic> list = null;
 		if (annotation != null) {
@@ -102,20 +103,9 @@ public class GitReadAspect {
 		return GitReadDynamic.builder().value(value).values(values).build();
 	}
 
-	private void init(ProceedingJoinPoint jp, Signature signature, GitReadDynamic annotation) {
-		publisher.publishEvent(new GitReadEvent(jp, annotation, EGitRead.INIT, commitParameters(jp, signature)));
-	}
-
-	private Object success(ProceedingJoinPoint jp, GitReadDynamic annotation, Object result) {
-		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.SUCCESS, result);
-		publisher.publishEvent(event);
-		return event.getResult();
-	}
-
-	private Throwable error(ProceedingJoinPoint jp, GitReadDynamic annotation, Throwable e) {
-		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.FAILURE, e);
-		publisher.publishEvent(event);
-		return event.getError();
+	protected void init(ProceedingJoinPoint jp, GitReadDynamic annotation) {
+		publisher
+				.publishEvent(new GitReadEvent(jp, annotation, EGitRead.INIT, commitParameters(jp, jp.getSignature())));
 	}
 
 	protected List<GitCommitValue> commitParameters(ProceedingJoinPoint jp, Signature signature) {
@@ -136,4 +126,17 @@ public class GitReadAspect {
 		}
 		return commits;
 	}
+
+	protected Object success(ProceedingJoinPoint jp, GitReadDynamic annotation, Object result) {
+		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.SUCCESS, result);
+		publisher.publishEvent(event);
+		return event.getResult();
+	}
+
+	protected Throwable error(ProceedingJoinPoint jp, GitReadDynamic annotation, Throwable e) {
+		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.FAILURE, e);
+		publisher.publishEvent(event);
+		return event.getError();
+	}
+
 }

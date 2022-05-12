@@ -16,20 +16,20 @@ public class GitWriteDynamic implements Serializable {
 	private String value = "";
 
 	@Builder.Default
-	private boolean watcher = true;
+	GitWriteDirDynamic[] values = new GitWriteDirDynamic[0];
 
 	@Builder.Default
-	GitWriteDirDynamic[] values = new GitWriteDirDynamic[0];
+	private boolean watcher = true;
 
 	public String value() {
 		return getValue();
 	}
 
-	public boolean watcher() {
-		return isWatcher();
-	}
-
 	public GitWriteDirDynamic[] values() {
 		return getValues();
+	}
+
+	public boolean watcher() {
+		return isWatcher();
 	}
 }

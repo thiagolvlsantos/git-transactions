@@ -1,5 +1,6 @@
 package io.github.thiagolvlsantos.git.transactions.write;
 
+import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,10 +42,9 @@ public class GitWriteAspect {
 		scope.openAspect();
 		Signature signature = jp.getSignature();
 		String name = signature.getName();
-		GitWriteDynamic dynamic = getDynamic(getAnnotation(signature), jp);
+		GitWriteDynamic dynamic = getDynamic(getAnnotation(signature, GitWrite.class), jp);
 		long time = System.currentTimeMillis();
 		init(jp, dynamic);
-		startWatcher(dynamic);
 		log.info("** WRITE({}).init: {} ms, {} **", name, System.currentTimeMillis() - time, dynamic);
 		try {
 			time = System.currentTimeMillis();
@@ -72,15 +72,15 @@ public class GitWriteAspect {
 		}
 	}
 
-	private GitWrite getAnnotation(Signature signature) {
+	protected <T extends Annotation> T getAnnotation(Signature signature, Class<T> type) {
 		if (signature instanceof MethodSignature) {
-			return AnnotationUtils.findAnnotation(((MethodSignature) signature).getMethod(), GitWrite.class);
+			return AnnotationUtils.findAnnotation(((MethodSignature) signature).getMethod(), type);
 		}
 		return null;
 	}
 
 	@SneakyThrows
-	private GitWriteDynamic getDynamic(GitWrite annotation, ProceedingJoinPoint jp) {
+	protected GitWriteDynamic getDynamic(GitWrite annotation, ProceedingJoinPoint jp) {
 		String value = null;
 		List<GitWriteDirDynamic> list = null;
 		if (annotation != null) {
@@ -105,7 +105,12 @@ public class GitWriteAspect {
 		return GitWriteDynamic.builder().value(value).values(values).build();
 	}
 
-	private void startWatcher(GitWriteDynamic annotation) {
+	protected void init(ProceedingJoinPoint jp, GitWriteDynamic annotation) {
+		publisher.publishEvent(new GitWriteEvent(jp, annotation, EGitWrite.INIT));
+		startWatcher(annotation);
+	}
+
+	protected void startWatcher(GitWriteDynamic annotation) {
 		IGitProvider provider = context.getBean(IGitProvider.class);
 		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
@@ -121,25 +126,21 @@ public class GitWriteAspect {
 		}
 	}
 
-	private void init(ProceedingJoinPoint jp, GitWriteDynamic annotation) {
-		publisher.publishEvent(new GitWriteEvent(jp, annotation, EGitWrite.INIT));
-	}
-
-	private Object success(ProceedingJoinPoint jp, GitWriteDynamic annotation, Object result) {
+	protected Object success(ProceedingJoinPoint jp, GitWriteDynamic annotation, Object result) {
 		stopWatcher(annotation, EWatcherAction.STOP);
 		GitWriteEvent event = new GitWriteEvent(jp, annotation, EGitWrite.SUCCESS, result);
 		publisher.publishEvent(event);
 		return event.getResult();
 	}
 
-	private Throwable error(ProceedingJoinPoint jp, GitWriteDynamic annotation, Throwable e) {
+	protected Throwable error(ProceedingJoinPoint jp, GitWriteDynamic annotation, Throwable e) {
 		stopWatcher(annotation, EWatcherAction.IGNORE);
 		GitWriteEvent event = new GitWriteEvent(jp, annotation, EGitWrite.FAILURE, e);
 		publisher.publishEvent(event);
 		return event.getError();
 	}
 
-	private void stopWatcher(GitWriteDynamic annotation, EWatcherAction action) {
+	protected void stopWatcher(GitWriteDynamic annotation, EWatcherAction action) {
 		IGitProvider provider = context.getBean(IGitProvider.class);
 		if (annotation.watcher() && !annotation.value().isEmpty()) {
 			String group = annotation.value();
