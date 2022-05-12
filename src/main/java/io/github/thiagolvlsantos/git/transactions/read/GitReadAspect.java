@@ -1,6 +1,5 @@
 package io.github.thiagolvlsantos.git.transactions.read;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.LinkedList;
@@ -14,73 +13,32 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import io.github.thiagolvlsantos.git.transactions.AbstractGitAspect;
 import io.github.thiagolvlsantos.git.transactions.GitRepo;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitProvider;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitRouter;
-import io.github.thiagolvlsantos.git.transactions.scope.AspectScope;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
 @Aspect
 @Component
-@Slf4j
 @Order(0)
-public class GitReadAspect {
+public class GitReadAspect extends AbstractGitAspect<GitRead, GitReadDynamic> {
 
-	private @Autowired ApplicationContext context;
 	private @Autowired ApplicationEventPublisher publisher;
 
 	@Around("@annotation(io.github.thiagolvlsantos.git.transactions.read.GitRead)")
 	public Object read(ProceedingJoinPoint jp) throws Throwable {
-		AspectScope scope = context.getBean(AspectScope.class);
-		scope.openAspect();
-		Signature signature = jp.getSignature();
-		String name = signature.getName();
-		GitReadDynamic dynamic = getDynamic(getAnnotation(signature, GitRead.class), jp);
-		long time = System.currentTimeMillis();
-		init(jp, dynamic);
-		log.info("** READ({}).init: {} ms, ({}) **", name, System.currentTimeMillis() - time, dynamic);
-		try {
-			time = System.currentTimeMillis();
-			Object result = success(jp, dynamic, jp.proceed());
-			log.info("** READ({}).success: {} ms **", name, System.currentTimeMillis() - time);
-			return result;
-		} catch (Throwable e) {
-			Throwable error = error(jp, dynamic, e);
-			log.error("** READ({}).failure: {} ms **", name, System.currentTimeMillis() - time);
-			throw error;
-		} finally {
-			try {
-				time = System.currentTimeMillis();
-				IGitProvider provider = context.getBean(IGitProvider.class);
-				if (!dynamic.value().isEmpty()) {
-					provider.cleanRead(dynamic.value());
-				}
-				for (GitReadDirDynamic d : dynamic.values()) {
-					provider.cleanRead(d.value());
-				}
-				log.info("** READ({}).finalyze: {} ms **", name, System.currentTimeMillis() - time);
-			} finally {
-				scope.closeAspect();
-			}
-		}
+		return perform(jp, GitRead.class);
 	}
 
-	protected <T extends Annotation> T getAnnotation(Signature signature, Class<T> type) {
-		if (signature instanceof MethodSignature) {
-			return AnnotationUtils.findAnnotation(((MethodSignature) signature).getMethod(), type);
-		}
-		return null;
-	}
-
+	@Override
 	@SneakyThrows
-	protected GitReadDynamic getDynamic(GitRead annotation, ProceedingJoinPoint jp) {
+	protected GitReadDynamic toDynamic(ProceedingJoinPoint jp, GitRead annotation) {
 		String value = null;
 		List<GitReadDirDynamic> list = null;
 		if (annotation != null) {
@@ -103,9 +61,10 @@ public class GitReadAspect {
 		return GitReadDynamic.builder().value(value).values(values).build();
 	}
 
+	@Override
 	protected void init(ProceedingJoinPoint jp, GitReadDynamic annotation) {
-		publisher
-				.publishEvent(new GitReadEvent(jp, annotation, EGitRead.INIT, commitParameters(jp, jp.getSignature())));
+		List<GitCommitValue> commitParameters = commitParameters(jp, jp.getSignature());
+		publisher.publishEvent(new GitReadEvent(jp, annotation, EGitRead.INIT, commitParameters));
 	}
 
 	protected List<GitCommitValue> commitParameters(ProceedingJoinPoint jp, Signature signature) {
@@ -127,16 +86,29 @@ public class GitReadAspect {
 		return commits;
 	}
 
+	@Override
 	protected Object success(ProceedingJoinPoint jp, GitReadDynamic annotation, Object result) {
 		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.SUCCESS, result);
 		publisher.publishEvent(event);
 		return event.getResult();
 	}
 
+	@Override
 	protected Throwable error(ProceedingJoinPoint jp, GitReadDynamic annotation, Throwable e) {
 		GitReadEvent event = new GitReadEvent(jp, annotation, EGitRead.FAILURE, e);
 		publisher.publishEvent(event);
 		return event.getError();
 	}
 
+	@Override
+	@SneakyThrows
+	protected void finish(GitReadDynamic dynamic) {
+		IGitProvider provider = context.getBean(IGitProvider.class);
+		if (!dynamic.value().isEmpty()) {
+			provider.cleanRead(dynamic.value());
+		}
+		for (GitReadDirDynamic d : dynamic.values()) {
+			provider.cleanRead(d.value());
+		}
+	}
 }
