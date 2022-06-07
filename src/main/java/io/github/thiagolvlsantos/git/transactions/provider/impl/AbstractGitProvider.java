@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullResult;
@@ -24,9 +25,7 @@ import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.FileSystemUtils;
 
-import io.github.thiagolvlsantos.git.commons.file.FileUtils;
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.id.impl.SessionIdHolderHelper;
@@ -246,7 +245,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		pullReadSilent(group);
 		long time = System.currentTimeMillis();
 		try {
-			FileSystemUtils.copyRecursively(directoryRead(group), directoryWrite(group));
+			FileUtils.copyDirectory(directoryRead(group), directoryWrite(group));
 		} catch (IOException e) {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
@@ -329,11 +328,8 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			git.close();
 		}
 		try {
-			boolean delete = FileUtils.delete(dir);
-			if (!delete) {
-				log.info("Could not delete: {}", dir);
-			}
-			log.debug("cleanWrite(success:{},{}):{} time={}", delete, key, dir, System.currentTimeMillis() - time);
+			FileUtils.deleteDirectory(dir);
+			log.debug("cleanWrite(success,{}):{} time={}", key, dir, System.currentTimeMillis() - time);
 		} catch (IOException e) {
 			log.debug("cleanWrite(error:{},{}):time={} error={}", key, dir, System.currentTimeMillis() - time,
 					e.getMessage());
