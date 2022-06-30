@@ -212,8 +212,15 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	@SuppressWarnings("serial")
 	protected Git instance(String group, File local, boolean silent) throws GitAPIException {
 		String remote = remote(group);
+		String branch = "master";
+		int index = remote.indexOf("@");
+		if (remote != null && index > 0) {
+			branch = remote.substring(index + 1);
+			remote = remote.substring(0, index);
+		}
 		if (!silent) {
-			log.info("{}.git({}): local:{}, remote:{}", getClass().getSimpleName(), group, local, remote);
+			log.info("{}.git({}): local:{}, remote:{}, branch:{}", getClass().getSimpleName(), group, local, remote,
+					branch);
 		}
 		try {
 			return Git.open(local);
@@ -221,6 +228,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			return Git.cloneRepository()//
 					.setCredentialsProvider(credentials(group))//
 					.setURI(remote)//
+					.setBranch(branch)//
 					.setDirectory(local).call();
 		} catch (IOException e) {
 			throw new GitAPIException(e.getMessage(), e) {
