@@ -14,7 +14,7 @@ public abstract class AbstractSessionIdHolder implements ISessionIdHolder {
 	@Override
 	public String current() {
 		if (time == null) {
-			time = String.valueOf(System.currentTimeMillis());
+			time = String.valueOf(System.currentTimeMillis() + "_" + System.nanoTime());
 			log.info("{}.ID={}", getClass().getName(), time);
 		}
 		return time;
