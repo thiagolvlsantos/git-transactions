@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullResult;
@@ -212,7 +213,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	@SuppressWarnings("serial")
 	protected Git instance(String group, File local, boolean silent) throws GitAPIException {
 		String remote = remote(group);
-		String branch = "master";
+		String branch = null;
 		int index = remote.indexOf("@");
 		if (remote != null && index > 0) {
 			branch = remote.substring(index + 1);
@@ -225,11 +226,14 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		try {
 			return Git.open(local);
 		} catch (RepositoryNotFoundException e) {
-			return Git.cloneRepository()//
+			CloneCommand clone = Git.cloneRepository()//
 					.setCredentialsProvider(credentials(group))//
 					.setURI(remote)//
-					.setBranch(branch)//
-					.setDirectory(local).call();
+					.setDirectory(local);
+			if (branch != null) {
+				clone = clone.setBranch(branch);
+			}
+			return clone.call();
 		} catch (IOException e) {
 			throw new GitAPIException(e.getMessage(), e) {
 			};
