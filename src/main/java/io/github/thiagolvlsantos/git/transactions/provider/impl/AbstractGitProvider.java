@@ -214,10 +214,12 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	protected Git instance(String group, File local, boolean silent) throws GitAPIException {
 		String remote = remote(group);
 		String branch = null;
-		int index = remote.indexOf("@");
-		if (remote != null && index > 0) {
-			branch = remote.substring(index + 1);
-			remote = remote.substring(0, index);
+		if (remote != null) {
+			int index = remote.indexOf("@");
+			if (index > 0) {
+				branch = remote.substring(index + 1);
+				remote = remote.substring(0, index);
+			}
 		}
 		if (!silent) {
 			log.info("{}.git({}): local:{}, remote:{}, branch:{}", getClass().getSimpleName(), group, local, remote,
