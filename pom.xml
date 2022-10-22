@@ -48,7 +48,7 @@
 		<sonar.coverage.exclusions>**/*Print.java,**/*Web.java,**/*Constants.java,**/*Test.java</sonar.coverage.exclusions>
 
 		<!-- PROJECT SPECIFIC -->
-		<jgit.version>6.2.0.202206071550-r</jgit.version>
+		<jgit.version>6.3.0.202209071007-r</jgit.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		
 		<!-- PERSONAL -->
