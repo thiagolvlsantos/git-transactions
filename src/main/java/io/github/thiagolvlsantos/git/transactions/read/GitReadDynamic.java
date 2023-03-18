@@ -5,11 +5,13 @@ import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @SuppressWarnings("serial")
+@ToString
 public class GitReadDynamic implements Serializable {
 
 	@Builder.Default
