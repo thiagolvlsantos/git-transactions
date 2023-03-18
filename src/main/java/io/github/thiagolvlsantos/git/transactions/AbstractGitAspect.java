@@ -25,6 +25,7 @@ public abstract class AbstractGitAspect<A extends Annotation, D> {
 		A annotation = getAnnotation(signature, type);
 		D dynamic = toDynamic(jp, annotation);
 		long time = System.currentTimeMillis();
+		long total = time;
 		init(jp, dynamic);
 		String simpleName = type.getSimpleName();
 		String name = signature.getName();
@@ -42,7 +43,9 @@ public abstract class AbstractGitAspect<A extends Annotation, D> {
 			try {
 				time = System.currentTimeMillis();
 				finish(dynamic);
-				log.info("** @{}({}).finalyze: {} ms **", simpleName, name, System.currentTimeMillis() - time);
+				long current = System.currentTimeMillis();
+				log.info("** @{}({}).finalyze: {} ms, TOTAL: {} ms**", simpleName, name, current - time,
+						current - total);
 			} finally {
 				scope.closeAspect();
 			}
