@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.5</version>
+		<version>2.7.9</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -35,10 +35,10 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<!-- LOMBOK -->
-		<lombok.version>1.18.20</lombok.version>
+		<lombok.version>1.18.26</lombok.version>
 
 		<!-- JUNIT -->
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.2</junit.version>
 
 		<!-- SONARCLOUD -->
 		<sonar.user>thiagolvlsantos</sonar.user>
@@ -48,7 +48,7 @@
 		<sonar.coverage.exclusions>**/*Print.java,**/*Web.java,**/*Constants.java,**/*Test.java</sonar.coverage.exclusions>
 
 		<!-- PROJECT SPECIFIC -->
-		<jgit.version>6.3.0.202209071007-r</jgit.version>
+		<jgit.version>6.5.0.202303070854-r</jgit.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		
 		<!-- PERSONAL -->
@@ -121,8 +121,6 @@
 			<version>${jgit.version}</version>
 		</dependency>
 		<dependency>
-			<!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=566260 -->
-			<!-- https://wiki.eclipse.org/JGit/New_and_Noteworthy/5.8#New_Bundles -->
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit.ssh.jsch</artifactId>
 			<version>${jgit.version}</version>
