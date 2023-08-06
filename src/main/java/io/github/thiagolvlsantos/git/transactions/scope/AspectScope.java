@@ -105,8 +105,12 @@ public class AspectScope implements Scope {
 	}
 
 	public void closeAspect() {
-		scope.remove(scope.size() - 1);
-		destruction.remove(destruction.size() - 1);
+		if (!scope.isEmpty()) {
+			scope.remove(scope.size() - 1);
+		}
+		if (!destruction.isEmpty()) {
+			destruction.remove(destruction.size() - 1);
+		}
 		log.debug("Scope closed.");
 	}
 }
