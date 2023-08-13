@@ -11,7 +11,7 @@
 
 	<groupId>io.github.thiagolvlsantos</groupId>
 	<artifactId>git-transactions</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.5</version>
 
 	<name>${project.artifactId}</name>
 	<description>Git transactions in Spring Boot.</description>
@@ -59,7 +59,7 @@
 		<url>https://${project.domain.name}/${project.owner.login}/${project.artifactId}.git</url>
 		<connection>scm:git:git://${project.domain.name}/${project.owner.login}/${project.artifactId}.git</connection>
 		<developerConnection>scm:git:git@${project.domain.name}:${project.owner.login}/${project.artifactId}.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>git-transactions-0.0.5</tag>
 	</scm>
 
 	<url>https://${project.domain.name}/${project.owner.login}/${project.artifactId}</url>
