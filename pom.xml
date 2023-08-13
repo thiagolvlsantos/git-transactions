@@ -52,7 +52,7 @@
 		<commons-io.version>2.11.0</commons-io.version>
 		
 		<!-- PERSONAL -->
-		<git-commons.version>1.0.31-SNAPSHOT</git-commons.version>
+		<git-commons.version>1.0.31</git-commons.version>
 	</properties>
 
 	<scm>
