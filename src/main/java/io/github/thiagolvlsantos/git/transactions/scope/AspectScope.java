@@ -1,7 +1,7 @@
 package io.github.thiagolvlsantos.git.transactions.scope;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AspectScope implements Scope {
 
-	private List<Map<String, Object>> scope = new LinkedList<>();
-	private List<Map<String, Runnable>> destruction = new LinkedList<>();
+	private List<Map<String, Object>> scope = new ArrayList<>();
+	private List<Map<String, Runnable>> destruction = new ArrayList<>();
 
 	public void openAspect() {
 		scope.add(new HashMap<>());
@@ -105,11 +105,21 @@ public class AspectScope implements Scope {
 	}
 
 	public void closeAspect() {
+		int scopePos = scope.size() - 1;
 		if (!scope.isEmpty()) {
-			scope.remove(scope.size() - 1);
+			if (scopePos >= 0) {
+				scope.remove(scopePos);
+			} else {
+				log.info("Invalid scope:{}", scopePos);
+			}
 		}
+		int destructionPos = destruction.size() - 1;
 		if (!destruction.isEmpty()) {
-			destruction.remove(destruction.size() - 1);
+			if (destructionPos >= 0) {
+				destruction.remove(destructionPos);
+			} else {
+				log.info("Invalid destruction:{}", destructionPos);
+			}
 		}
 		log.debug("Scope closed.");
 	}
