@@ -10,12 +10,12 @@ public class AspectScopeConfig {
 	private static AspectScopePostProcessor processor = new AspectScopePostProcessor();
 
 	@Bean
-	public AspectScope scope() {
+	protected AspectScope scope() {
 		return processor.instance();
 	}
 
 	@Bean
-	public static BeanFactoryPostProcessor beanFactoryPostProcessor() {
+	protected static BeanFactoryPostProcessor beanFactoryPostProcessor() {
 		return processor;
 	}
 }
