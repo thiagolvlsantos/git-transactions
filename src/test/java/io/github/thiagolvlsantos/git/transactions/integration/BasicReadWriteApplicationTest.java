@@ -24,7 +24,7 @@ class BasicReadWriteApplicationTest {
 		BasicWrite s = ctx.getBean(BasicWrite.class);
 		BasicRead r = ctx.getBean(BasicRead.class);
 
-		String tool = ctx.getBean(Environment.class).getProperty("tool");
+		String tool = ctx.getBean(Environment.class).getProperty("tool", "local");
 		// # FIRST WRITE
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");

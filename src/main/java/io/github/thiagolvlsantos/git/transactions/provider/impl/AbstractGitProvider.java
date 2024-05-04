@@ -14,8 +14,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
@@ -81,7 +79,8 @@ public abstract class AbstractGitProvider implements IGitProvider {
 
 	@Override
 	public void init() throws GitAPIException {
-		log.info("Init.");
+		long time = System.currentTimeMillis();
+		log.info("init() time={}", System.currentTimeMillis() - time);
 	}
 
 	@Override
@@ -233,8 +232,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	}
 
 	@SuppressWarnings("serial")
-	protected Git newInstance(String group, File local)
-			throws GitAPIException, InvalidRemoteException, TransportException {
+	protected Git newInstance(String group, File local) throws GitAPIException {
 		String remote = remote(group);
 		String branch = null;
 		if (remote != null) {
@@ -274,8 +272,8 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			return null;
 		}
 		PullResult pull = git.pull().setCredentialsProvider(credentials(group)).call();
-		log.debug("pullRead({}) time={}", group, System.currentTimeMillis() - time);
 		this.pulledRead.put(git, directoryRead(group));
+		log.debug("pullRead({}) time={}", group, System.currentTimeMillis() - time);
 		return pull;
 	}
 
@@ -290,16 +288,21 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			return null;
 		}
 		PullResult result = pullRead(group);
+		File to = directoryWrite(group);
 		try {
-			FileUtils.copyDirectory(directoryRead(group), directoryWrite(group));
+			File from = directoryRead(group);
+			log.info("COPY {} to {}", from, to);
+			if (!to.exists()) {
+				FileUtils.copyDirectory(from, to);
+			}
 		} catch (IOException e) {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
 			}
 			throw new GitTransactionsException(e.getMessage(), e);
 		}
+		this.pulledWrite.put(git, to);
 		log.debug("pullWrite({}) time={}", group, System.currentTimeMillis() - time);
-		this.pulledWrite.put(git, directoryWrite(group));
 		return result;
 	}
 
@@ -360,31 +363,51 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	@Override
 	public void clean() throws GitAPIException {
 		long time = System.currentTimeMillis();
+
+		if (!this.localGit.isEmpty()) {
+			for (Map.Entry<File, Git> entry : this.localGit.entrySet()) {
+				Git git = entry.getValue();
+				git.close();
+			}
+			log.debug("Clean git local = {}", this.localGit.keySet());
+		}
+		this.localGit.clear();
+
 		if (!this.gitsRead.isEmpty()) {
 			for (Map.Entry<String, Git> entry : this.gitsRead.entrySet()) {
-				Git val = entry.getValue();
-				val.close();
+				Git git = entry.getValue();
+				git.close();
 			}
-			log.info("Clean git reads = {}", this.gitsRead.keySet());
+			log.debug("Clean git reads = {}", this.gitsRead.keySet());
 		}
 		this.gitsRead.clear();
+
+		if (!this.pulledRead.isEmpty()) {
+			for (Map.Entry<Git, File> entry : this.pulledRead.entrySet()) {
+				Git git = entry.getKey();
+				git.close();
+			}
+			log.debug("Clean pulled reads = {}", this.pulledRead.values());
+		}
 		this.pulledRead.clear();
 
 		if (!this.gitsWrite.isEmpty()) {
 			for (Map.Entry<String, Git> entry : this.gitsWrite.entrySet()) {
-				Git val = entry.getValue();
-				val.close();
+				Git git = entry.getValue();
+				git.close();
 			}
-			log.info("Clean git writes = {}", this.gitsWrite.keySet());
+			log.debug("Clean git writes = {}", this.gitsWrite.keySet());
 		}
 		this.gitsWrite.clear();
 
 		if (!this.pulledWrite.isEmpty()) {
 			for (Map.Entry<Git, File> entry : this.pulledWrite.entrySet()) {
-				File val = entry.getValue();
-				cleanDirectory(val);
+				Git git = entry.getKey();
+				git.close();
+				File dir = entry.getValue();
+				cleanDirectory(dir);
 			}
-			log.info("Clean dir writes = {}", this.pulledWrite.values());
+			log.debug("Clean pulled writes = {}", this.pulledWrite.values());
 		}
 		this.pulledWrite.clear();
 
@@ -393,7 +416,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				File dir = entry.getValue();
 				cleanDirectory(dir);
 			}
-			log.info("Clean dir commits = {}", this.gitsCommits.keySet());
+			log.debug("Clean dir commits = {}", this.gitsCommits.keySet());
 		}
 		this.gitsCommits.clear();
 
@@ -404,7 +427,9 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		long time = System.currentTimeMillis();
 		IOException error = null;
 		try {
-			FileUtils.deleteDirectory(dir);
+			if (dir.exists()) {
+				FileUtils.forceDelete(dir);
+			}
 		} catch (IOException e) {
 			error = e;
 		} finally {

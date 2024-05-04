@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
-import io.github.thiagolvlsantos.git.transactions.scope.AspectScope;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,8 +18,8 @@ public abstract class AbstractGitAspect<A extends Annotation, D> {
 	protected @Autowired ApplicationContext context;
 
 	public Object perform(ProceedingJoinPoint jp, Class<A> type) throws Throwable {
-		AspectScope scope = context.getBean(AspectScope.class);
-		scope.openAspect();
+		IGitTransaction manager = context.getBean(IGitTransaction.class);
+		manager.begin(context);
 		Signature signature = jp.getSignature();
 		A annotation = getAnnotation(signature, type);
 		D dynamic = toDynamic(jp, annotation);
@@ -44,10 +43,10 @@ public abstract class AbstractGitAspect<A extends Annotation, D> {
 				time = System.currentTimeMillis();
 				finish(dynamic);
 				long current = System.currentTimeMillis();
-				log.info("** @{}({}).finalyze: {} ms, TOTAL: {} ms**", simpleName, name, current - time,
+				log.info("** @{}({}).finalyze: {} ms, TOTAL: {} ms **", simpleName, name, current - time,
 						current - total);
 			} finally {
-				scope.closeAspect();
+				manager.finish(context);
 			}
 		}
 	}
