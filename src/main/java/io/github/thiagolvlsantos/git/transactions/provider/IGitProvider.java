@@ -11,6 +11,8 @@ import org.eclipse.jgit.transport.PushResult;
 
 public interface IGitProvider {
 
+	void init() throws GitAPIException;
+
 	void setTimestamp(String group, Long timestamp) throws GitAPIException;
 
 	void setCommit(String group, String commit) throws GitAPIException;
@@ -48,6 +50,8 @@ public interface IGitProvider {
 	void cleanRead(String group) throws GitAPIException;
 
 	void cleanWrite(String group) throws GitAPIException;
+
+	void clean() throws GitAPIException;
 
 	Iterable<RevCommit> logRead(String group, String path, Integer skip, Integer max) throws GitAPIException;
 
