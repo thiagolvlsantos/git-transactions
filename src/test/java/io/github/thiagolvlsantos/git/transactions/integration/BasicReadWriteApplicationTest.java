@@ -24,6 +24,9 @@ class BasicReadWriteApplicationTest {
 		BasicRead r = ctx.getBean(BasicRead.class);
 
 		String tool = System.getenv("TOOL");
+		if (tool == null) {
+			tool = System.getProperty("TOOL", "local");
+		}
 		System.out.println("@@@@@@@ TOOL = " + tool);
 		// # FIRST WRITE
 
