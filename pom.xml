@@ -26,7 +26,7 @@
 		<project.inception>2021</project.inception>
 
 		<!-- COMPILER -->
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 
@@ -243,13 +243,6 @@
 					<updateReleaseInfo>true</updateReleaseInfo>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.5.0.1254</version>
-			</plugin>
-
 		</plugins>
 	</build>
 	
