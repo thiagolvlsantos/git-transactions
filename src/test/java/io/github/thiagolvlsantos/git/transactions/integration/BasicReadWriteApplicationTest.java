@@ -27,7 +27,7 @@ class BasicReadWriteApplicationTest {
 		if (tool == null) {
 			tool = System.getProperty("TOOL", "local");
 		}
-		System.out.println("@@@@@@@ TOOL = " + tool);
+		System.out.println("@@@@@@@ TOOL = " + tool + " @@@@@@@@@@@@@@@");
 		// # FIRST WRITE
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
