@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
@@ -24,7 +23,7 @@ class BasicReadWriteApplicationTest {
 		BasicWrite s = ctx.getBean(BasicWrite.class);
 		BasicRead r = ctx.getBean(BasicRead.class);
 
-		String tool = ctx.getBean(Environment.class).getProperty("TOOL", "local");
+		String tool = System.getenv("TOOL");
 		// # FIRST WRITE
 
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
