@@ -459,7 +459,6 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	private Iterable<RevCommit> log(String group, String path, Git git, Integer skip, Integer max)
 			throws GitAPIException {
 		long time = System.currentTimeMillis();
-		doPull(group, git);
 		LogCommand command = git.log();
 		String normalizedPath = normalizeRead(group, path);
 		if (normalizedPath != null) {

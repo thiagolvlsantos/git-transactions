@@ -8,28 +8,28 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.MDC;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 import io.github.thiagolvlsantos.git.transactions.IGitTransaction;
 import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsException;
 import io.github.thiagolvlsantos.git.transactions.provider.IGitProvider;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
-public class GitTransactionImpl implements IGitTransaction {
+public abstract class AbstractGitTransaction implements IGitTransaction {
 
-	private static final String GAP = "gap";
+	private static final String TRANSACTION_LEVEL = "gtlevel";
 	private AtomicInteger counter = new AtomicInteger(0);
 	private Map<Integer, String> gaps = new ConcurrentHashMap<>();
 
 	@Override
-	public void begin(ApplicationContext context) throws GitTransactionsException {
+	public void beginTransaction(ApplicationContext context) throws GitTransactionsException {
 		try {
-			setGap();
-			log.debug("push({})", counter.intValue());
-			counter.incrementAndGet();
-			context.getBean(IGitProvider.class).init();
+			synchronized (counter) {
+				setGitTransactionLevel();
+				log.debug("push({})", counter.intValue());
+				counter.incrementAndGet();
+				context.getBean(IGitProvider.class).init();
+			}
 		} catch (BeansException | GitAPIException e) {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
@@ -38,8 +38,8 @@ public class GitTransactionImpl implements IGitTransaction {
 		}
 	}
 
-	protected void setGap() {
-		MDC.put(GAP, gaps.computeIfAbsent(counter.intValue(), n -> {
+	protected void setGitTransactionLevel() {
+		MDC.put(TRANSACTION_LEVEL, gaps.computeIfAbsent(counter.intValue(), n -> {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < n; i++) {
 				sb.append("    ");
@@ -49,26 +49,23 @@ public class GitTransactionImpl implements IGitTransaction {
 	}
 
 	@Override
-	public int depth(ApplicationContext context) throws GitTransactionsException {
-		return counter.intValue();
-	}
-
-	@Override
-	public void finish(ApplicationContext context) throws GitTransactionsException {
+	public void endTransaction(ApplicationContext context) throws GitTransactionsException {
 		try {
-			int current = counter.decrementAndGet();
-			if (current == 0) {
-				context.getBean(IGitProvider.class).clean();
+			synchronized (counter) {
+				int current = counter.decrementAndGet();
+				if (current == 0) {
+					context.getBean(IGitProvider.class).clean();
+				}
+				log.debug("pop({})", current);
+				setGitTransactionLevel();
 			}
-			log.debug("pop({})", current);
-			setGap();
 		} catch (BeansException | GitAPIException e) {
 			if (log.isDebugEnabled()) {
 				log.debug(e.getMessage(), e);
 			}
 			throw new GitTransactionsException(e.getMessage(), e);
 		} finally {
-			MDC.remove(GAP);
+			MDC.remove(TRANSACTION_LEVEL);
 		}
 	}
 }

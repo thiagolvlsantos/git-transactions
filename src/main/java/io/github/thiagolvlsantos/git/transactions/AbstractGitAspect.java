@@ -19,7 +19,7 @@ public abstract class AbstractGitAspect<A extends Annotation, D> {
 
 	public Object perform(ProceedingJoinPoint jp, Class<A> type) throws Throwable {
 		IGitTransaction manager = context.getBean(IGitTransaction.class);
-		manager.begin(context);
+		manager.beginTransaction(context);
 		Signature signature = jp.getSignature();
 		A annotation = getAnnotation(signature, type);
 		D dynamic = toDynamic(jp, annotation);
@@ -46,7 +46,7 @@ public abstract class AbstractGitAspect<A extends Annotation, D> {
 				log.info("** @{}({}).finalyze: {} ms, TOTAL: {} ms **", simpleName, name, current - time,
 						current - total);
 			} finally {
-				manager.finish(context);
+				manager.endTransaction(context);
 			}
 		}
 	}
