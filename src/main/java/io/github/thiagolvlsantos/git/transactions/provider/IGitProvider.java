@@ -9,9 +9,11 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
 
+import io.github.thiagolvlsantos.git.transactions.IGitAnnotation;
+
 public interface IGitProvider {
 
-	void init() throws GitAPIException;
+	void init(IGitAnnotation annotation) throws GitAPIException;
 
 	void setTimestamp(String group, Long timestamp) throws GitAPIException;
 
@@ -51,7 +53,7 @@ public interface IGitProvider {
 
 	void cleanWrite(String group) throws GitAPIException;
 
-	void clean() throws GitAPIException;
+	void clean(IGitAnnotation annotation) throws GitAPIException;
 
 	Iterable<RevCommit> logRead(String group, String path, Integer skip, Integer max) throws GitAPIException;
 

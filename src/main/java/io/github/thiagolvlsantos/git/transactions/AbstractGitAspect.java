@@ -13,22 +13,22 @@ import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsExce
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractGitAspect<A extends Annotation, D> {
+public abstract class AbstractGitAspect<A extends Annotation, D extends IGitAnnotation> {
 
 	protected @Autowired ApplicationContext context;
 
 	public Object perform(ProceedingJoinPoint jp, Class<A> type) throws Throwable {
 		IGitTransaction manager = context.getBean(IGitTransaction.class);
-		manager.beginTransaction(context);
 		Signature signature = jp.getSignature();
 		A annotation = getAnnotation(signature, type);
 		D dynamic = toDynamic(jp, annotation);
+		manager.beginTransaction(context, dynamic);
 		long time = System.currentTimeMillis();
 		long total = time;
 		init(jp, dynamic);
 		String simpleName = type.getSimpleName();
 		String name = signature.getName();
-		log.info("** @{}({}).init: {} ms, ({}) **", simpleName, name, System.currentTimeMillis() - time, dynamic);
+		log.info("** @{}({}).init: {} ms, @{} **", simpleName, name, System.currentTimeMillis() - time, dynamic);
 		time = System.currentTimeMillis();
 		try {
 			Object result = success(jp, dynamic, jp.proceed());
@@ -46,7 +46,7 @@ public abstract class AbstractGitAspect<A extends Annotation, D> {
 				log.info("** @{}({}).finalyze: {} ms, TOTAL: {} ms **", simpleName, name, current - time,
 						current - total);
 			} finally {
-				manager.endTransaction(context);
+				manager.endTransaction(context, dynamic);
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package io.github.thiagolvlsantos.git.transactions.read;
 
 import java.io.Serializable;
 
+import io.github.thiagolvlsantos.git.transactions.IGitAnnotation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @SuppressWarnings("serial")
 @ToString
-public class GitReadDynamic implements Serializable {
+public class GitReadDynamic implements Serializable, IGitAnnotation {
 
 	@Builder.Default
 	private String value = "";

@@ -6,7 +6,7 @@ import io.github.thiagolvlsantos.git.transactions.exceptions.GitTransactionsExce
 
 public interface IGitTransaction {
 
-	void beginTransaction(ApplicationContext context) throws GitTransactionsException;
+	void beginTransaction(ApplicationContext context, IGitAnnotation annotation) throws GitTransactionsException;
 
-	void endTransaction(ApplicationContext context) throws GitTransactionsException;
+	void endTransaction(ApplicationContext context, IGitAnnotation annotation) throws GitTransactionsException;
 }
