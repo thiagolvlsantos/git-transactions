@@ -27,7 +27,7 @@ import lombok.SneakyThrows;
 
 @Aspect
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE - 1)
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class GitReadAspect extends AbstractGitAspect<GitRead, GitReadDynamic> {
 
 	private @Autowired ApplicationEventPublisher publisher;
