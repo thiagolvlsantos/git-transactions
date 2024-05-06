@@ -44,7 +44,7 @@ public abstract class AbstractGitTransaction implements IGitTransaction {
 		MDC.put(TRANSACTION_LEVEL, levels.computeIfAbsent(counter.intValue(), n -> {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < n; i++) {
-				sb.append("\t");
+				sb.append("    ");
 			}
 			return sb.toString();
 		}));
