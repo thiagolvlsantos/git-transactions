@@ -14,6 +14,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ import lombok.SneakyThrows;
 
 @Aspect
 @Component
-@Order(0)
+@Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class GitReadAspect extends AbstractGitAspect<GitRead, GitReadDynamic> {
 
 	private @Autowired ApplicationEventPublisher publisher;

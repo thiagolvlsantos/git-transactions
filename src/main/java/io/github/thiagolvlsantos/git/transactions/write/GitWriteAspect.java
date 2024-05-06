@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ import lombok.SneakyThrows;
 
 @Aspect
 @Component
-@Order(10)
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class GitWriteAspect extends AbstractGitAspect<GitWrite, GitWriteDynamic> {
 
 	private @Autowired ApplicationEventPublisher publisher;
