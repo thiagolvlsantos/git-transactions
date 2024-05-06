@@ -27,23 +27,25 @@ public abstract class AbstractGitAspect<A extends Annotation, D extends IGitAnno
 		long total = time;
 		init(jp, dynamic);
 		String simpleName = type.getSimpleName();
-		String name = signature.getName();
-		log.info("** @{}({}).init: {} ms, @{} **", simpleName, name, System.currentTimeMillis() - time, dynamic);
+		String group = dynamic.value();
+		String method = signature.getName();
+		log.info("** @{}({}[{}]).init: {} ms, @{} **", simpleName, group, method, System.currentTimeMillis() - time,
+				dynamic);
 		time = System.currentTimeMillis();
 		try {
 			Object result = success(jp, dynamic, jp.proceed());
-			log.info("** @{}({}).success: {} ms **", simpleName, name, System.currentTimeMillis() - time);
+			log.info("** @{}({}[{}]).success: {} ms **", simpleName, group, method, System.currentTimeMillis() - time);
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, dynamic, e);
-			log.error("** @{}({}).failure: {} ms **", simpleName, name, System.currentTimeMillis() - time);
+			log.error("** @{}({}[{}]).failure: {} ms **", simpleName, group, method, System.currentTimeMillis() - time);
 			throw error;
 		} finally {
 			try {
 				time = System.currentTimeMillis();
 				finish(dynamic);
 				long current = System.currentTimeMillis();
-				log.info("** @{}({}).finalyze: {} ms, TOTAL: {} ms **", simpleName, name, current - time,
+				log.info("** @{}({}[{}]).finalyze: {} ms, TOTAL: {} ms **", simpleName, group, method, current - time,
 						current - total);
 			} finally {
 				manager.endTransaction(context, dynamic);

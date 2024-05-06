@@ -374,9 +374,10 @@ public abstract class AbstractGitProvider implements IGitProvider {
 				Git git = entry.getValue();
 				git.close();
 			}
-			log.info("Close gits = {}", this.gitInstances.keySet());
+			log.debug("close gits({}) = {}", annotation.value(), this.gitInstances.keySet());
 		}
 		this.gitInstances.clear();
+
 		this.pulledReads.clear();
 		this.gitReads.clear();
 
@@ -384,7 +385,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			for (Map.Entry<Git, File> entry : this.pulledWrites.entrySet()) {
 				cleanDirectory(entry.getValue());
 			}
-			log.info("Clean writes = {}", this.pulledWrites.values());
+			log.debug("clean writes({}) = {}", annotation.value(), this.pulledWrites.values());
 		}
 		this.pulledWrites.clear();
 		this.gitWrites.clear();
@@ -393,7 +394,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			for (Map.Entry<String, File> entry : this.gitCommits.entrySet()) {
 				cleanDirectory(entry.getValue());
 			}
-			log.info("Clean commits = {}", this.gitCommits.keySet());
+			log.debug("clean commits({}) = {}", annotation.value(), this.gitCommits.keySet());
 		}
 		this.gitCommits.clear();
 
@@ -411,9 +412,9 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			error = e;
 		} finally {
 			if (error == null) {
-				log.debug("clean(success):{} time={}", dir, System.currentTimeMillis() - time);
+				log.debug("clean(success): {} time={}", dir, System.currentTimeMillis() - time);
 			} else {
-				log.debug("clean(error:{}): time={} error={}", dir, System.currentTimeMillis() - time,
+				log.debug("clean(error: {}): time={} error={}", dir, System.currentTimeMillis() - time,
 						error.getMessage());
 			}
 		}
@@ -444,7 +445,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			command = command.setMaxCount(max);
 		}
 		Iterable<RevCommit> call = command.call();
-		log.info("log({}):{}, time={}", group, normalizedPath, System.currentTimeMillis() - time);
+		log.info("log({}): {}, time={}", group, normalizedPath, System.currentTimeMillis() - time);
 		return call;
 	}
 }
