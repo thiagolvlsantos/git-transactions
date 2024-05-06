@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractGitTransaction implements IGitTransaction {
 
-	private static final String TRANSACTION_LEVEL = "gtlevel";
-	private AtomicInteger counter = new AtomicInteger(0);
-	private Map<Integer, String> levels = new ConcurrentHashMap<>();
+	protected static final String TRANSACTION_LEVEL = "gtlevel";
+	protected AtomicInteger counter = new AtomicInteger(0);
+	protected Map<Integer, String> levels = new ConcurrentHashMap<>();
 
 	@Override
 	public void beginTransaction(ApplicationContext context, IGitAnnotation annotation)
@@ -28,9 +28,9 @@ public abstract class AbstractGitTransaction implements IGitTransaction {
 		try {
 			synchronized (counter) {
 				setGitTransactionLevel();
+				log.debug("");
+				log.debug("** @@@@@@@@@@@@@@ START: {} >>>>>>>>>>>>>>>>>>> ", annotation.value());
 				log.debug("push({}): {}", counter.intValue(), annotation.value());
-				log.debug("** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-				log.debug("** @@@@@@@@@@@@@@ START: {}", annotation.value());
 				counter.incrementAndGet();
 				context.getBean(IGitProvider.class).init(annotation);
 			}
@@ -57,12 +57,10 @@ public abstract class AbstractGitTransaction implements IGitTransaction {
 		try {
 			synchronized (counter) {
 				int current = counter.decrementAndGet();
-				if (current == 0) {
-					context.getBean(IGitProvider.class).clean(annotation);
-				}
+				endOnCounter(context, annotation, current);
 				log.debug("pop({}): {}", current, annotation);
-				log.debug("** @@@@@@@@@@@@@@ END: {}", annotation.value());
-				log.debug("** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				log.debug("** <<<<<<<<<<<<<<<<<< END: {} @@@@@@@@@@@@@@", annotation.value());
+				log.debug("");
 				setGitTransactionLevel();
 			}
 		} catch (BeansException | GitAPIException e) {
@@ -72,6 +70,13 @@ public abstract class AbstractGitTransaction implements IGitTransaction {
 			throw new GitTransactionsException(e.getMessage(), e);
 		} finally {
 			MDC.remove(TRANSACTION_LEVEL);
+		}
+	}
+
+	protected void endOnCounter(ApplicationContext context, IGitAnnotation annotation, int current)
+			throws GitAPIException {
+		if (current == 0) {
+			context.getBean(IGitProvider.class).clean(annotation);
 		}
 	}
 }

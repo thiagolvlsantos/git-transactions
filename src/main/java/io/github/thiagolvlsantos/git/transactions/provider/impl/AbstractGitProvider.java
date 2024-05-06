@@ -26,7 +26,6 @@ import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.annotation.Async;
 
 import io.github.thiagolvlsantos.git.transactions.IGitAnnotation;
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
@@ -376,12 +375,13 @@ public abstract class AbstractGitProvider implements IGitProvider {
 	public void clean(IGitAnnotation annotation) throws GitAPIException {
 		long time = System.currentTimeMillis();
 
+		String group = annotation != null ? annotation.value() : "na";
 		if (!this.gitInstances.isEmpty()) {
 			for (Map.Entry<File, Git> entry : this.gitInstances.entrySet()) {
 				Git git = entry.getValue();
 				git.close();
 			}
-			log.debug("close gits({}) = {}", annotation.value(), this.gitInstances.keySet());
+			log.debug("close gits({}) = {}", group, this.gitInstances.keySet());
 		}
 		this.gitInstances.clear();
 
@@ -392,7 +392,7 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			for (Map.Entry<Git, File> entry : this.pulledWrites.entrySet()) {
 				cleanDirectory(entry.getValue());
 			}
-			log.debug("clean writes({}) = {}", annotation.value(), this.pulledWrites.values());
+			log.debug("clean writes({}) = {}", group, this.pulledWrites.values());
 		}
 		this.pulledWrites.clear();
 		this.gitWrites.clear();
@@ -401,11 +401,11 @@ public abstract class AbstractGitProvider implements IGitProvider {
 			for (Map.Entry<String, File> entry : this.gitCommits.entrySet()) {
 				cleanDirectory(entry.getValue());
 			}
-			log.debug("clean commits({}) = {}", annotation.value(), this.gitCommits.keySet());
+			log.debug("clean commits({}) = {}", group, this.gitCommits.keySet());
 		}
 		this.gitCommits.clear();
 
-		log.info("clean({}) time={}", annotation.value(), System.currentTimeMillis() - time);
+		log.info("clean({}) time={}", group, System.currentTimeMillis() - time);
 	}
 
 	protected void cleanDirectory(File dir) {
