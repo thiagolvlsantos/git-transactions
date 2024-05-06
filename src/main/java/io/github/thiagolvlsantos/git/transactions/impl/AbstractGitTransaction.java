@@ -29,6 +29,8 @@ public abstract class AbstractGitTransaction implements IGitTransaction {
 			synchronized (counter) {
 				setGitTransactionLevel();
 				log.debug("push({}): {}", counter.intValue(), annotation.value());
+				log.debug("** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				log.debug("** @@@@@@@@@@@@@@ START: {}", annotation.value());
 				counter.incrementAndGet();
 				context.getBean(IGitProvider.class).init(annotation);
 			}
@@ -59,6 +61,8 @@ public abstract class AbstractGitTransaction implements IGitTransaction {
 					context.getBean(IGitProvider.class).clean(annotation);
 				}
 				log.debug("pop({}): {}", current, annotation);
+				log.debug("** @@@@@@@@@@@@@@ END: {}", annotation.value());
+				log.debug("** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				setGitTransactionLevel();
 			}
 		} catch (BeansException | GitAPIException e) {

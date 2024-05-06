@@ -26,6 +26,7 @@ import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Async;
 
 import io.github.thiagolvlsantos.git.transactions.IGitAnnotation;
 import io.github.thiagolvlsantos.git.transactions.config.GitConfiguration;
@@ -292,7 +293,13 @@ public abstract class AbstractGitProvider implements IGitProvider {
 		if (this.pulledWrites.containsKey(git)) {
 			return null;
 		}
-		PullResult result = pullRead(group);
+		PullResult result = null;
+		String keyRead = keyRead(group);
+		if (this.gitReads.containsKey(keyRead)) {
+			log.info("CACHED: {}", keyRead);
+		} else {
+			result = pullRead(group);
+		}
 		File to = directoryWrite(group);
 		try {
 			File from = directoryRead(group);
