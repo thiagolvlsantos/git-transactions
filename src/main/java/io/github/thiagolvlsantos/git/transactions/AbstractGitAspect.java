@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractGitAspect<A extends Annotation, D extends IGitAnnotation> {
 
+	private static long serial = 0;
 	protected @Autowired ApplicationContext context;
 
 	public Object perform(ProceedingJoinPoint jp, Class<A> type) throws Throwable {
@@ -29,24 +30,27 @@ public abstract class AbstractGitAspect<A extends Annotation, D extends IGitAnno
 		String simpleName = type.getSimpleName();
 		String group = dynamic.value();
 		String method = signature.getName();
-		log.info("** @{}({}[{}]).init: {} ms, @{} **", simpleName, group, method, System.currentTimeMillis() - time,
-				dynamic);
+		final long seq = serial++;
+		log.info("** #{} @{}({}[{}]).init: {} ms, @{} **", seq, simpleName, group, method,
+				System.currentTimeMillis() - time, dynamic);
 		time = System.currentTimeMillis();
 		try {
 			Object result = success(jp, dynamic, jp.proceed());
-			log.info("** @{}({}[{}]).success: {} ms **", simpleName, group, method, System.currentTimeMillis() - time);
+			log.info("** #{} @{}({}[{}]).success: {} ms **", seq, simpleName, group, method,
+					System.currentTimeMillis() - time);
 			return result;
 		} catch (Throwable e) {
 			Throwable error = error(jp, dynamic, e);
-			log.error("** @{}({}[{}]).failure: {} ms **", simpleName, group, method, System.currentTimeMillis() - time);
+			log.error("** #{} @{}({}[{}]).failure: {} ms **", seq, simpleName, group, method,
+					System.currentTimeMillis() - time);
 			throw error;
 		} finally {
 			try {
 				time = System.currentTimeMillis();
 				finish(dynamic);
 				long current = System.currentTimeMillis();
-				log.info("** @{}({}[{}]).finalyze: {} ms, TOTAL: {} ms **", simpleName, group, method, current - time,
-						current - total);
+				log.info("** #{} @{}({}[{}]).finalyze: {} ms, TOTAL: {} ms **", seq, simpleName, group, method,
+						current - time, current - total);
 			} finally {
 				manager.endTransaction(context, dynamic);
 			}
